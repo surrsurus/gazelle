@@ -1,0 +1,11 @@
+(# set upper and lower limits)
+(set *upper* 100)
+(set *lower* 1)
+
+(# always return the average)
+(set guess (lamb (_) (prinv (>> (+ *upper* *lower*) 1))))
+
+(set smaller (lamb (_) (global *upper* (+ (guess) 1))))
+(set bigger (lamb (_) (global *lower* (- (guess) 1))))
+
+(repl)

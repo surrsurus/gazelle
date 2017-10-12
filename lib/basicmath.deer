@@ -1,0 +1,17 @@
+(set square (lamb (x) (pow x 2)))
+
+(set cube (lamb (x) (pow x 3)))
+
+(set circle-area (lamb (r) (* pi (* r r))))
+
+(set circle-cirum (lamb (r) (* 2 pi r)))
+
+(set sphere-volume (lamb (r) (* (/ 4 3) pi (pow r 3))))
+
+(set sphere-surf-area (lamb (r) (* pi 4 (pow r 2))))
+
+(set ! (lamb (n) (if (<= n 1) 1 (* n (! (- n 1))))))
+
+(set fib (lamb (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))
+
+(set fun-fib (lamb (x) (map fib (grange 0 x))))

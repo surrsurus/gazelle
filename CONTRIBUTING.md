@@ -1,4 +1,4 @@
-# Contributing to Deercode
+# Contributing to Gazelle
 
 Please follow these guidelines or your code or issues may be rejected.
 
@@ -20,4 +20,4 @@ Please follow these guidelines or your code or issues may be rejected.
 
 ## Sumbitting code changes
 - Submit a pull request with your code
-- Make sure it's as clean as possible and fits in with deercode's [quality standards](https://github.com/surrsurus/deercode/wiki/Pull-Request-Code-Quality-Guidelines)
+- Make sure it's as clean as possible and fits in with Gazelle's [quality standards](https://github.com/surrsurus/gazelle/wiki/Pull-Request-Code-Quality-Guidelines)

@@ -1,0 +1,17 @@
+(def square (lamb (x) (pow x 2)))
+
+(def cube (lamb (x) (pow x 3)))
+
+(def circle-area (lamb (r) (* pi (* r r))))
+
+(def circle-cirum (lamb (r) (* 2 pi r)))
+
+(def sphere-volume (lamb (r) (* (/ 4 3) pi (pow r 3))))
+
+(def sphere-surf-area (lamb (r) (* pi 4 (pow r 2))))
+
+(def ! (lamb (n) (if (<= n 1) 1 (* n (! (- n 1))))))
+
+(def fib (lamb (n) (if (< n 2) 1 (+ (fib (- n 1)) (fib (- n 2))))))
+
+(def fun-fib (lamb (x) (map fib (grange 0 x))))

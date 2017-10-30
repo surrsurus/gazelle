@@ -1,0 +1,3 @@
+;; Project euler question 1 answer
+;; 233168
+(sum (compress (range 1000) (map (lamb (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))

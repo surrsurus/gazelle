@@ -1,0 +1,3 @@
+(def fb-check (lamb (n) (if (and (= (% n 5) 0) (= (% n 3) 0)) (eval "fizzbuzz") (if (= (% n 5) 0) (eval "buzz") (if (= (% n 3) 0) (eval "fizz") (eval n) ))) ))
+(def fizzbuzz (lamb (n) (map fb-check (range n)) ))
+(display (fizzbuzz 100))

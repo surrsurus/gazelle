@@ -1,1 +1,0 @@
-(set collatz (lamb (n) (eval (prinv n) (if (> n 1) (if (even? n) (collatz (// n 2)) (collatz (+ 1 (* 3 n)))) (false)))))

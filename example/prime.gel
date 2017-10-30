@@ -1,0 +1,10 @@
+;; set up a series of tests to conduct to find if a number is prime
+(def test-1 (lamb (x) (<= x 1)))
+(def test-2 (lamb (x) (<= x 3)))
+(def test-3 (lamb (x) (or (= (% x 2) 0) (= (% x 3) 0))))
+(def test-4 (lamb (i n) (or (eq (% n i) 0) (eq (% n (+ i 2)) 0))))
+(def test-5 (lamb (i n) (if (<= (* i i) n) (if (test-4 i n) (false) (test-5 (+ i 6) n)) (true))))
+
+;; the full test
+(def prime? (lamb (n) (if (test-1 n) (false) (if (test-2 n) (true) (if (test-3 n) (false) (test-5 5 n))))))
+(display (prime? 2))

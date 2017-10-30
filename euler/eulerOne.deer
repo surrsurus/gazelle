@@ -1,1 +1,0 @@
-(sum (compress (grange 1000) (map (lamb (n) (or (= (% n 5) 0) (= (% n 3) 0))) (grange 1000))))

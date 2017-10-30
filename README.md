@@ -41,6 +41,10 @@ In addition, files can be ran by using a file path as your argument such as `py 
 
 Take a look at the [getting started guide](https://github.com/surrsurus/gazelle/wiki/Getting-Started) and our [documentation](https://github.com/surrsurus/gazelle/wiki/Documentation) to learn how to code with deercode. You can view example programs in the [examples folder](https://github.com/surrsurus/gazelle/tree/master/example) packaged with deercode
 
+## Run Tests
+
+Run the integration tests by executing `./gazelle.py test`
+
 # Shortcomings
 
 Gazelle is very much lacking when it comes to efficiency. Gazelle lacks tail-call optimizations and lazy evaluation, two things that would make Gazelle much faster. Python really limits what deercode can do and we're looking to begin porting this to a different language

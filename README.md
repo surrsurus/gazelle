@@ -28,7 +28,7 @@ Gazelle can be used to write answers to Project Euler questions. Here's problem 
 
 #### Linux
 
-1. Install Python 3.5 with your package manager of choice
+1. Install Python 2 with your package manager of choice
 2. Run `linux-repl.sh`
 
 # Basic Usage

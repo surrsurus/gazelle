@@ -101,8 +101,8 @@ stdenv_tests = [
     ("(null? '())", True),
     ("(number? 1)", True),
     ("(number? \"1\")", False),
-    ("(procedure? bool?)", True),
-    ("(procedure? 12345)", False),
+    ("(proc? bool?)", True),
+    ("(proc? 12345)", False),
     ("(round 1.2)", 1.0),
     ("(round 1.7)", 2.0),
     ("(str? \"hello world\")", True)

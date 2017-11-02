@@ -1,1 +1,5 @@
-(def collatz (lamb (n) (eval (prinv n) (if (> n 1) (if (even? n) (collatz (// n 2)) (collatz (+ 1 (* 3 n)))) (false)))))
+(begin
+  ;; The Collatz conjecture in Gazelle
+  ;; Run it as `(collatz int)` and get an answer. Spoiler alert, it will probably be 1
+  (def collatz (\ (n) (if (> n 1) (if (even? n) (collatz (// n 2)) (collatz (+ 1 (* 3 n)))) (return n))))
+)

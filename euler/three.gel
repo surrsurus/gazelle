@@ -1,0 +1,16 @@
+(begin
+
+  (def (primefac i f)
+    (if (< i f)
+      (return '())
+      (if (= (% i f) 0)
+        (return (append (list f) (primefac (/ i f) 2)))
+        (return (primefac i (+ f 1)))
+      )
+    )
+  )
+  
+  ;; Will cause recursion error.
+  (return (max (primefac 600851475143 2)))
+
+)

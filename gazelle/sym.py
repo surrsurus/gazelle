@@ -7,43 +7,45 @@
 # integer, float, or complex number, therefore it must be a string
 class Symbol(str): pass
 
-# Turn strings into `Symbol`s
+# Find or create unique Symbol entry for str s in symbol table
 # String, (Dict) -> Atom
 def Sym(s, symbol_table={}):
-    "Find or create unique Symbol entry for str s in symbol table."
-    if s not in symbol_table: symbol_table[s] = Symbol(s)
-    return symbol_table[s]
+  if s not in symbol_table: symbol_table[s] = Symbol(s)
+  return symbol_table[s]
 
 # Dictionary of common symbols we check for when expanding
 # and evaluating
 Symbols = {
-    'append':          Sym('append'),       # Needed for `expandquasiquote()`
-    'begin':           Sym('begin'),        
-    'check-expect':    Sym('check-expect'),
-    'check-within':    Sym('check-within'),
-    'cons':            Sym('cons'),         # Needed for `expandquasiquote()`
-    'def':             Sym('def'),
-    'display':         Sym('display'),      # Needed for `eval()`
-    'if':              Sym('if'),
-    'lamb':            Sym('lamb'),
-    'let':             Sym('let'),
-    'macro':           Sym('macro'),
-    'member?':         Sym('member?'),
-    'quasiquote':      Sym('quasiquote'),
-    'quote':           Sym('quote'),
-    'set!':            Sym('set!'),
-    'unquote':         Sym('unquote'),
-    'unquotesplicing': Sym('unquotesplicing')
+  'append':          Sym('append'),       
+  'begin':           Sym('begin'),        
+  'check-expect':    Sym('check-expect'),
+  'check-within':    Sym('check-within'),
+  'cons':            Sym('cons'),
+  'def':             Sym('def'),
+  'display':         Sym('display'),
+  'if':              Sym('if'),
+  'include':         Sym('include'),
+  'lambda':          Sym('lambda'),
+  '\\':              Sym('\\'),
+  'let':             Sym('let'),
+  'macro':           Sym('macro'),
+  'member?':         Sym('member?'),
+  'quasiquote':      Sym('quasiquote'),
+  'quote':           Sym('quote'),
+  'return':          Sym('return'),
+  'set!':            Sym('set!'),
+  'unquote':         Sym('unquote'),
+  'unquotesplicing': Sym('unquotesplicing')
 }
 
 # Quotes such as these must be expanded into
 # `Symbol`s before evaluation time
 Quotes = { 
-    '\'': Symbols['quote'],
-    '`':  Symbols['quasiquote'],
-    ',':  Symbols['unquote'],
-    ',@': Symbols['unquotesplicing']
+  '\'': Symbols['quote'],
+  '`':  Symbols['quasiquote'],
+  ',':  Symbols['unquote'],
+  ',@': Symbols['unquotesplicing']
 }
 
-# The eof_object represents the end of a file or input
-eof_object = Symbol('#<eof-object>') # Note: uninterned; can't be read
+# The eof represents the end of a file or input
+eof = Symbol('#<eof>') # Note: uninterned; can't be read

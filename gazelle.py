@@ -1,4 +1,5 @@
+# Local deps
 from gazelle import cli
 
-if __name__ == "__main__":
-    cli.start()
+if __name__ == '__main__':
+  cli.start()

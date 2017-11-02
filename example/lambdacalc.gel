@@ -1,0 +1,36 @@
+(begin
+
+  ;; Some lambda calculus combinators in Gazelle
+  ;; NOTE: These do not substitute well into each other
+  ;; So (S K K x) will not be equivalent to I, for example
+  ;; These are mostly just fun thought experiments
+
+  ;; S
+  ;; \x y z -> x z (y z)
+  (def S (\ (x y z) (return (x z (y z)))))
+
+  ;; K
+  ;; \x y -> x
+  (def K (\ (x y) (return x)))
+
+  ;; I
+  ;; \x -> x
+  (def I (\ (x) (return x)))
+
+  ;; B
+  ;; \x y z) -> (x (y z))
+  (def B (\ (x y z) (return (x (y z)))))
+
+  ;; C
+  ;; \x y z) -> (x z y)
+  (def C (\ (x y z) (return (x z y))))
+
+  ;; Y
+  ;; \f -> (\x -> f (x x)) (\x -> f (x x))
+  (def Y
+    (\ (X)
+      ((\ (procedure) (X (\ (arg) ((procedure procedure) arg))))
+       (\ (procedure) (X (\ (arg) ((procedure procedure) arg)))))
+    )
+  )
+)

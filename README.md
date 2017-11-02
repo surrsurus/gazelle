@@ -4,19 +4,20 @@ Gazelle - A scripting language inspired by LISP and Scheme
 # Why Gazelle?
 Gazelle is:
 - **Easy to setup** 
-  - Have Python 2? You can run Gazelle. Gazelle requires no external dependencies.
+  - Have Python 2? You can run Gazelle. Gazelle requires no external dependencies (that shouldn't be already downloaded)
 - **Inspired by LISP and Scheme**
-  - Gazelle code is written entirely with prefix notation in the form `(proc args)` like LISP and Scheme
-  - Functions are simply labels attached to lambda expressions, anything you can do with lambda calculus, you can do here.
+  - Gazelle code is written entirely with prefix notation in the form `(procedure expression)`
+  - Gazelle has no true AST, instead the programmer ends up directly coding the AST for Gazelle to interpret
+  - Only 3 fundamental types: Atoms, Lists, and Procedures
 - **Extendable**
-  - Adding features to Gazelle is simple and easy through editing the python source
+  - Adding features to Gazelle is simple and easy through editing the python source or via directly programming in Gazelle itself
 
-The interpreter has a REPL and can run gazelle files, everything you need to get started when coding in gazelle!
+The interpreter has a REPL and can run gazelle files, and contains everything you need to get started when coding.
 
 # Not convinced?
 Gazelle can be used to write answers to Project Euler questions. Here's problem 1:
 
-`(sum (compress (range 1000) (map (lamb (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))`
+`(return (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))`
 
 # How to use
 
@@ -28,7 +29,7 @@ Gazelle can be used to write answers to Project Euler questions. Here's problem 
 
 #### Linux
 
-1. Install Python 2 with your package manager of choice
+1. Install Python 2 with your package manager of choice (though on most distros it should be included by default)
 2. Run `linux-repl.sh`
 
 # Basic Usage

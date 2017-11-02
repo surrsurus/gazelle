@@ -1,15 +1,20 @@
 import sys
 
 # Local deps
-from atomizer import Atomize
+from atomizer import Atomizer
 import repl
 import integration_tests
 
+### CLI
+# The commandline interface helps determine what action
+# the user is trying to perform. Based on the arguments, we
+# can either load files, start the REPL, or run the tests.
+
+# Examine the commandline arguments and determine what to do
 def start():
-  ''' Examine the commandline and determine what to do '''
 
   # Load stdlib
-  repl.capture_parseval(Atomize(open('./lib/stdlib.gel')))
+  repl.capture_parseval(Atomizer(open('./lib/stdlib.gel')))
 
   # Start Repl
   #  repl starts under the condition :
@@ -25,4 +30,8 @@ def start():
   #  repl will rep all files after the program name such as:
   #  `py gazelle.py file1.gel file2.gel ... fileN.gel`
   else:
-    [repl.capture_parseval(Atomize(open(file))) for file in sys.argv[1:]]
+      for file in sys.argv[1:]:
+        if file == 'repl':
+          repl.run()
+          exit()
+        repl.capture_parseval(Atomizer(open(file)))

@@ -2,68 +2,70 @@
 
 (begin
 
-    ;; And macro
-    (macro and (lamb args 
-    (if (nil? args) #t
-        (if (= (length args) 1) (car args)
-            `(if ,(car args) (and ,@(cdr args)) #f)))))
+  ;; nil
+  (def nil '())
+  (def nil? (\ (x) (if (= x '()) #t #f )))
 
-    ;; Most implementations of a lisp-like lang
-    ;; have `car`/`cdr` combinations nested 4 deep
-    (def caar (lamb (pair) (car (car pair))))
-    (def cadr (lamb (pair) (car (cdr pair))))
-    (def cdar (lamb (pair) (cdr (car pair))))
-    (def cddr (lamb (pair) (cdr (cdr pair))))
-    (def caaar (lamb (pair) (car (car (car pair)))))
-    (def caadr (lamb (pair) (car (car (cdr pair)))))
-    (def cadar (lamb (pair) (car (cdr (car pair)))))
-    (def caddr (lamb (pair) (car (cdr (cdr pair)))))
-    (def cdaar (lamb (pair) (cdr (car (car pair)))))
-    (def cdadr (lamb (pair) (cdr (car (cdr pair)))))
-    (def cddar (lamb (pair) (cdr (cdr (car pair)))))
-    (def cdddr (lamb (pair) (cdr (cdr (cdr pair)))))
-    (def caaaar (lamb (pair) (car (car (car (car pair))))))
-    (def caaadr (lamb (pair) (car (car (car (cdr pair))))))
-    (def caadar (lamb (pair) (car (car (cdr (car pair))))))
-    (def caaddr (lamb (pair) (car (car (cdr (cdr pair))))))
-    (def cadaar (lamb (pair) (car (cdr (car (car pair))))))
-    (def cadadr (lamb (pair) (car (cdr (car (cdr pair))))))
-    (def caddar (lamb (pair) (car (cdr (cdr (car pair))))))
-    (def cadddr (lamb (pair) (car (cdr (cdr (cdr pair))))))
-    (def cdaaar (lamb (pair) (cdr (car (car (car pair))))))
-    (def cdaadr (lamb (pair) (cdr (car (car (cdr pair))))))
-    (def cdadar (lamb (pair) (cdr (car (cdr (car pair))))))
-    (def cdaddr (lamb (pair) (cdr (car (cdr (cdr pair))))))
-    (def cddaar (lamb (pair) (cdr (cdr (car (car pair))))))
-    (def cddadr (lamb (pair) (cdr (cdr (car (cdr pair))))))
-    (def cdddar (lamb (pair) (cdr (cdr (cdr (car pair))))))
-    (def cddddr (lamb (pair) (cdr (cdr (cdr (cdr pair))))))
+  ;; And macro
+  (macro and (\ args 
+  (if (nil? args) #t
+    (if (= (length args) 1) (car args)
+      `(if ,(car args) (and ,@(cdr args)) #f)))))
 
-    ;; nil
-    (def nil '())
-    (def nil? (lamb (x) (if (= x '()) #t #f )))
+  ;; Most implementations of a lisp-like lang
+  ;; have `car`/`cdr` combinations nested 4 deep
+  (def caar (\ (pair) (car (car pair))))
+  (def cadr (\ (pair) (car (cdr pair))))
+  (def cdar (\ (pair) (cdr (car pair))))
+  (def cddr (\ (pair) (cdr (cdr pair))))
+  (def caaar (\ (pair) (car (car (car pair)))))
+  (def caadr (\ (pair) (car (car (cdr pair)))))
+  (def cadar (\ (pair) (car (cdr (car pair)))))
+  (def caddr (\ (pair) (car (cdr (cdr pair)))))
+  (def cdaar (\ (pair) (cdr (car (car pair)))))
+  (def cdadr (\ (pair) (cdr (car (cdr pair)))))
+  (def cddar (\ (pair) (cdr (cdr (car pair)))))
+  (def cdddr (\ (pair) (cdr (cdr (cdr pair)))))
+  (def caaaar (\ (pair) (car (car (car (car pair))))))
+  (def caaadr (\ (pair) (car (car (car (cdr pair))))))
+  (def caadar (\ (pair) (car (car (cdr (car pair))))))
+  (def caaddr (\ (pair) (car (car (cdr (cdr pair))))))
+  (def cadaar (\ (pair) (car (cdr (car (car pair))))))
+  (def cadadr (\ (pair) (car (cdr (car (cdr pair))))))
+  (def caddar (\ (pair) (car (cdr (cdr (car pair))))))
+  (def cadddr (\ (pair) (car (cdr (cdr (cdr pair))))))
+  (def cdaaar (\ (pair) (cdr (car (car (car pair))))))
+  (def cdaadr (\ (pair) (cdr (car (car (cdr pair))))))
+  (def cdadar (\ (pair) (cdr (car (cdr (car pair))))))
+  (def cdaddr (\ (pair) (cdr (car (cdr (cdr pair))))))
+  (def cddaar (\ (pair) (cdr (cdr (car (car pair))))))
+  (def cddadr (\ (pair) (cdr (cdr (car (cdr pair))))))
+  (def cdddar (\ (pair) (cdr (cdr (cdr (car pair))))))
+  (def cddddr (\ (pair) (cdr (cdr (cdr (cdr pair))))))
 
-    ;; Folders
-    (def foldr (lamb (f z l)
-    (if (nil? l)
-        z
-        (f (car l) (foldr f z (cdr l))))))
+  ;; Folders
+  (def foldr (\ (f z l)
+  (if (nil? l)
+    z
+    (f (car l) (foldr f z (cdr l))))))
 
-    (def foldl (lamb (f z l)
-    (if (nil? l)
-        z
-        (foldl f (f z (car l)) (cdr l)))))
+  (def foldl (\ (f z l)
+  (if (nil? l)
+    z
+    (foldl f (f z (car l)) (cdr l)))))
 
-    ;; Define some common aliases for foldl
-    (def fold (lamb (f z l) (foldl f z l)))
-    (def reduce (lamb (f z l) (foldl f z l)))
+  ;; Define some common aliases for foldl
+  (def fold (\ (f z l) (foldl f z l)))
+  (def reduce (\ (f z l) (foldl f z l)))
 
-    (def flip (lamb (f) (lamb (a b) (f b a))))
-    (def curry (lamb (f a) (lamb (b) (f a b))))
+  (def flip (\ (f) (\ (a b) (f b a))))
+  (def curry (\ (f a) (\ (b) (f a b))))
 
-    (def reverse (lamb (list) (foldl (flip cons) '() list)))
+  (def reverse (\ (list) (foldl (flip cons) '() list)))
 
-    ;; Seems to break python recursion
-    ;; (def map (lamb (f l) (foldr (lamb (x z) (cons (f x) z)) '() l)))
+  (def even? (\ (n) (= (% n 2) 0)))
+
+  ;; Seems to break python recursion
+  ;; (def map (\ (f l) (foldr (\ (x z) (cons (f x) z)) '() l)))
 
 )

@@ -1,28 +1,22 @@
-### Parsing and Evaluation Module
-
-from atomizer import Atomize
+# Local deps
+from atomizer import Atomizer
 from env import Environment
-from sym import eof_object, Symbol, Symbols, Quotes
-
-import StringIO, re
-
-### Helpers
-# Convert a Python object back into a Scheme-readable string.
-# Object -> Gazelle Expression
-def schemestr(exp):
-    if isinstance(exp, list):
-        return '(' + ' '.join(map(schemestr, exp)) + ')' 
-    else:
-        return str(exp)
+from gazellestr import convert as gazellestr
+from stdenv import global_env
+from sym import eof, Symbol, Symbols, Quotes
 
 ### Parser
 
-# Atomize or String -> Gazelle Expression
-def parse(inport):
-    "Parse a program: read and expand/error-check it."
-    # Backwards compatibility: given a str, convert it to an `Atomize`
-    if isinstance(inport, str): inport = Atomize(StringIO.StringIO(inport))
-    return expand(inport.read(), toplevel=True)
+# Parse a program: read and expand/error-check it
+# atomizer -> Gazelle Expression
+def parse(atomizer):
+
+  # Backwards compatibility: given a str, convert it to an atomizer
+  import StringIO
+  if isinstance(atomizer, str): 
+    atomizer = Atomizer(StringIO.StringIO(atomizer))
+
+  return expand(atomizer.read(), toplevel=True)
 
 # Expand turns an atomized gazelle expression into an expression
 # that is readily readable by `eval()`. You can view this as
@@ -30,190 +24,232 @@ def parse(inport):
 # that optimizes and expands syntactic sugar. This also checks
 # syntax for any errors
 # Atomized Gazelle Expression, (Boolean) -> Gazelle Expression
-def expand(x, toplevel=False):
-    # TODO: lists should be joined
-    "Walk tree of x, making optimizations/fixes, and signaling SyntaxError."
+#
+# We can't just name this parse and expect it to work with the atomizer
+# object. It recursively looks at the expression and changes it,
+# so it would not work at all with the way the `Atomizer` class works
+def expand(expr, toplevel=False):
 
-    # Our input expression should not be an empty list
-    if x == []:
-        raise SyntaxError('Expression is empty')   # () => Error
+  # Our input expression should not be an empty list
+  # () => Error
+  if expr == []:
+    raise SyntaxError('Expression is empty')
 
-    # If it isn't a list, we don't need to expand it
-    elif not isinstance(x, list):                  # constant => unchanged
-        return x
+  # If it isn't a list, we don't need to expand it
+  # constant => unchanged
+  elif not isinstance(expr, list):
+    return expr
 
-    # The leftmost term should always be a procedure.
-    # We use this to compare it to our symbol table
-    procedure = x[0]
+  # The leftmost term should always be a procedure.
+  # We use this to compare it to our symbol table
+  # procedure = (procedure arg1 arg2 arg3 ...)
+  procedure = expr[0]
 
+  # Expand quotes
+  # (quote expe)
+  if procedure is Symbols['quote']:
     # Check to make sure our quote expression is the proper length
-    if procedure is Symbols['quote']:                  # (quote exp)
-        if len(x) != 2: 
-            raise SyntaxError(schemestr(x) + ': quote has recieved '
-                + str(len(x) - 1) + ' arguments, not 1')
+    if len(expr) != 2: 
+      raise SyntaxError(gazellestr(expr) + ': quote has recieved '
+        + str(len(expr) - 1) + ' arguments, not 1')
 
-        return x
+    return expr
 
-    # Check our if statement and make the proper optimizations,
-    # check it's arguments, and expand them
-    elif procedure is Symbols['if']:                # (if t c e)
-        if len(x) == 3: 
-            # No else statement
-            x = x + [None]                         # (if t c) => (if t c None)
-            
+  # Check our if statement and make the proper optimizations,
+  # check it's arguments, and expand them
+  # (if t c e)
+  elif procedure is Symbols['if']:
+    # Since there's no else, make sure we add a None so the
+    # next error check doesn't trigger
+    if len(expr) == 3: 
+      # No else statement
+      # (if t c) => (if t c None)
+      expr = expr + [None] 
 
-        elif len(x) != 4:
-            raise SyntaxError(schemestr(x) + ': if statement has recieved '
-                + str(len(x) - 1) + ' arguments, not 2 or 3')
+    # Not enough arguments or too many
+    elif len(expr) != 4:
+      raise SyntaxError(gazellestr(expr) + ': if statement has recieved '
+        + str(len(expr) - 1) + ' arguments, not 2 or 3')
 
-        return map(expand, x)
+    return map(expand, expr)
 
-    # Make sure we are only applying set! to a symbol
-    elif procedure is Symbols['set!']:                
-        if len(x) != 3:
-            raise SyntaxError(schemestr(x) + ': set! has recieved ' 
-                + str(len(x) - 1) + ' arguments, not 2')               
+  # Make sure we are only applying set! to a symbol
+  # (set! var expr)
+  elif procedure is Symbols['set!']:
+    if len(expr) != 3:
+      raise SyntaxError(gazellestr(expr) + ': set! has recieved ' 
+        + str(len(expr) - 1) + ' arguments, not 2')
 
-        var = x[1]                       
+    (_, var, expr) = expr
 
-        if not isinstance(var, Symbol):            # (set! non-var exp) => Error
-            raise SyntaxError(schemestr(x) + 
-                ': set! expects a symbol')
+    # (set! non-var expr) => Error
+    if not isinstance(var, Symbol):
+      raise SyntaxError(gazellestr(expr) + 
+        ': set! expects a symbol')
 
-        return [Symbols['set!'], var, expand(x[2])]
+    return [Symbols['set!'], var, expand(expr)]
 
-    # Validate def and macro
-    elif procedure is Symbols['def'] or procedure is Symbols['macro']: 
+  # Validate def and macro
+  # (def var expr), (macro var expr)
+  elif procedure is Symbols['def'] or procedure is Symbols['macro']: 
 
-        if len(x) < 3:
-            raise SyntaxError(schemestr(x) + 
-                ': definition expects at least 2 arguments')
+    if len(expr) < 3:
+      raise SyntaxError(gazellestr(expr) + 
+        ': definition expects at least 2 arguments')
 
-        # V is ???
-        # Body is the expression we want to bind to v
-        var, body = x[1], x[2:]
+    # Var is the label we want to represent the expression
+    # Body is the expression we want to bind to var
+    var, body = expr[1], expr[2:]
 
-        if isinstance(var, list) and var:          # (define (f args) body)
-            name, args = var[0], var[1:]           #  => (define name (lambda (args) body))
-            return expand([procedure, name, [Symbols['lamb'], args] + body])
+    # Var needs to exist
+    # TODO: Test this, I feel like we don't need it since the first
+    # error check should capture this possibility
+    # if not var:
+    #     raise SyntaxError(gazellestr(expr) +
+    #         ': definition expects to bind to a variable, none given')
 
-        else:
+    # Expressions in the form (def (f) (expr)) will break on evaluation
+    # as it would need to be called literally as ((f) ...)
+    # (def (f) expr)
+    if isinstance(var, list) and len(var) == 1:
+      var = var[0]
 
-            if len(x) != 3:                        # (define non-var/list exp) => Error
-                raise SyntaxError(schemestr(x) + 
-                    ': definition expects 3 arguments')
-
-            if not isinstance(var, Symbol):
-                raise SyntaxError(schemestr(x) +
-                    ': definition expects to bind to a symbol')
-
-            # Expand the expression we want to bind to v
-            exp = expand(x[2])
-
-            # Macro expansion
-            if procedure is Symbols['macro']:
-                if not toplevel:
-                    raise SyntaxError(schemestr(x) + 
-                        ': macros can only be defined at the top level') 
-
-                proc = eval(exp)
-
-                if not callable(proc):
-                    raise SyntaxError(schemestr(x) + 
-                        ': macro must be a procedure, not an atom or list')   
-                
-                # Add our macro to the macro table
-                macro_table[var] = proc             # (define-macro v proc)
-
-                return None                         #  => None; add v:proc to macro_table
-
-            return [Symbols['def'], var, exp]
-
-    # Expand the content of begin if it exists
-    elif procedure is Symbols['begin']:
-        if len(x)==1:                                
-            return None                    
-        else: 
-            return [expand(xi, toplevel) for xi in x]
-
-    # Expand a lambda expression
-    elif procedure is Symbols['lamb']:               # (lambda (x) e1 e2) 
-        if len(x) < 3:                             #  => (lambda (x) (begin e1 e2))
-            raise SyntaxError(schemestr(x) + 
-                ': lamb expects at least 2 arguments')
-
-        var, body = x[1], x[2:]
-
-        # If the arguments are not a list, and everything isn't a symbol, there is a problem
-        if not (isinstance(var, list) and all(isinstance(v, Symbol) for v in var) or isinstance(var, Symbol)):
-            raise SyntaxError(schemestr(x) +
-                ': illegal lamb argument list')
-
-        exp = body[0] if len(body) == 1 else [Symbols['begin']] + body
-
-        return [Symbols['lamb'], var, expand(exp)]   
-
-    # Expand quasiquote
-    elif procedure is Symbols['quasiquote']:         # `x => expand_quasiquote(x)
-        if len(x) != 2:
-            raise SyntaxError(schemestr(x) + 
-                ': quasiquote (`) expects at least 2 arguments')
-        return expand_quasiquote(x[1])
-
-    # Expand macros that already exist
-    elif isinstance(procedure, Symbol) and procedure in macro_table:
-        return expand(macro_table[procedure](*x[1:]), toplevel) # (m arg...) 
-
-    # Otherwise we need to keep expanding the expression
-    else:                                
-        return map(expand, x)                       # (f arg...) => expand each
-
-# Gazelle Expression -> Gazelle Expression
-def expand_quasiquote(x):
-    """Expand `x => 'x; `,x => x; `(,@x y) => (append x y) """
-
-    if not (x != [] and isinstance(x, list)):
-        return [Symbols['quote'], x]
-
-    if x[0] is Symbols['unquotesplicing']:
-        raise SyntaxError(schemestr(x) + 
-            ': can\'t splice here')
-
-    if x[0] is Symbols['unquote']:
-        if len(x) != 2:
-            raise SyntaxError(schemestr(x) + 
-                ': unquote (,) expects 1 argument')
-
-        return x[1]
-
-    elif (x[0] != [] and isinstance(x[0], list)) and x[0][0] is Symbols['unquotesplicing']:
-        if len(x[0]) != 2:
-            raise SyntaxError(schemestr(x[0]) + 
-                ': unquotesplicing (,@) expects 1 argument')
-
-        return [Symbols['append'], x[0][1], expand_quasiquote(x[1:])]
+    # Turn (def (f args) body) into the proper lambda expression
+    # (def (f args) body) ...
+    if isinstance(var, list):
+      
+      # ... => (def name (lambda (args) body))
+      name, args = var[0], var[1:]
+      return expand([procedure, name, [Symbols['lambda'], args] + body])
 
     else:
-        return [Symbols['cons'], expand_quasiquote(x[0]), expand_quasiquote(x[1:])]
+      
+      # (def non-var/list exp) => Error
+      if len(expr) != 3:
+        raise SyntaxError(gazellestr(expr) + 
+          ': definition expects 3 arguments')
+
+      # (def 12345 exp) => Error
+      if not isinstance(var, Symbol):
+        raise SyntaxError(gazellestr(expr) +
+          ': definition expects to bind to a symbol')
+
+      # Expand the expression we want to bind to v
+      exp = expand(expr[2])
+
+      # Macro expansion
+      if procedure is Symbols['macro']:
+        if not toplevel:
+          raise SyntaxError(gazellestr(expr) + 
+            ': macros can only be defined at the top level') 
+
+        proc = eval(exp)
+
+        if not callable(proc):
+          raise SyntaxError(gazellestr(expr) + 
+            ': macro must be a procedure, not an atom or list')   
+        
+        # Add our macro to the macro table
+        # (macro v proc)
+        macro_table[var] = proc
+
+        # => None; add v:proc to macro_table
+        return None
+
+      return [Symbols['def'], var, exp]
+
+  # Expand the content of begin if it exists
+  elif procedure is Symbols['begin']:
+    # Prevents infinite loop
+    if len(expr)==1:
+      return None
+    else: 
+      return [expand(xi, toplevel) for xi in expr]
+
+  # Expand a lambda expression
+  # (lambda (expr) e1 e2) 
+  elif procedure in [Symbols['lambda'], Symbols['\\']]:
+    
+    # => (lambda (expr) (begin e1 e2))
+    if len(expr) < 3:
+      raise SyntaxError(gazellestr(expr) + 
+        ': lambda expects at least 2 arguments')
+
+    var, body = expr[1], expr[2:]
+
+    # If the arguments are not a list of symbols, there is a problem
+    if not (isinstance(var, list) and all(isinstance(v, Symbol) for v in var) or isinstance(var, Symbol)):
+      raise SyntaxError(gazellestr(expr) +
+        ': illegal lambda argument list')
+
+    exp = body[0] if len(body) == 1 else [Symbols['begin']] + body
+
+    return [Symbols['lambda'], var, expand(exp)]   
+
+  # Expand quasiquote
+  # `expr => expand_quasiquote(expr)
+  elif procedure is Symbols['quasiquote']:
+    if len(expr) != 2:
+      raise SyntaxError(gazellestr(expr) + 
+        ': quasiquote (`) expects at least 2 arguments')
+    return expand_quasiquote(expr[1])
+
+  # Expand macros that already exist
+  # (m arg...) 
+  elif isinstance(procedure, Symbol) and procedure in macro_table:
+    return expand(macro_table[procedure](*expr[1:]), toplevel)
+
+  # Otherwise we need to keep expanding the expression
+  else:
+    # (f arg...) => expand each
+    return map(expand, expr)
+
+# Expand `expr => 'expr; `,expr => expr; `(,@expr y) => (append expr y)
+# Gazelle Expression -> Gazelle Expression
+def expand_quasiquote(expr):
+
+  if not (expr != [] and isinstance(expr, list)):
+    return [Symbols['quote'], expr]
+
+  if expr[0] is Symbols['unquotesplicing']:
+    raise SyntaxError(gazellestr(expr) + 
+      ': can\'t splice here')
+
+  if expr[0] is Symbols['unquote']:
+    if len(expr) != 2:
+      raise SyntaxError(gazellestr(expr) + 
+        ': unquote (,) expects 1 argument')
+
+    return expr[1]
+
+  elif (expr[0] != [] and isinstance(expr[0], list)) and expr[0][0] is Symbols['unquotesplicing']:
+    if len(expr[0]) != 2:
+      raise SyntaxError(gazellestr(expr[0]) + 
+        ': unquotesplicing (,@) expects 1 argument')
+
+    return [Symbols['append'], expr[0][1], expand_quasiquote(expr[1:])]
+
+  else:
+    return [Symbols['cons'], expand_quasiquote(expr[0]), expand_quasiquote(expr[1:])]
 
 ### Macros
 
 # Arguments -> Gazelle Expression
 def let(*args):
-    args = list(args)
-    x = [Symbols['let']] + args
+  args = list(args)
+  expr = [Symbols['let']] + args
 
-    if len(args) <= 1:
-        raise SyntaxError(schemestr(x) + ': let expects greater than 1 argument')
+  if len(args) <= 1:
+    raise SyntaxError(gazellestr(expr) + ': let expects greater than 1 argument')
 
-    bindings, body = args[0], args[1:]
+  bindings, body = args[0], args[1:]
 
-    if not all(isinstance(b, list) and len(b)==2 and isinstance(b[0], Symbol) for b in bindings):
-        raise SyntaxError(schemestr(x) + ': let was given an illegal binding list')
+  if not all(isinstance(b, list) and len(b)==2 and isinstance(b[0], Symbol) for b in bindings):
+    raise SyntaxError(gazellestr(expr) + ': let was given an illegal binding list')
 
-    var, vals = zip(*bindings)
+  var, vals = zip(*bindings)
 
-    return [[Symbols['lamb'], list(var)]+map(expand, body)] + map(expand, vals)
+  return [[Symbols['lambda'], list(var)]+map(expand, body)] + map(expand, vals)
 
 macro_table = {Symbols['let']:let} ## More macros can go here
 
@@ -224,7 +260,7 @@ macro_table = {Symbols['let']:let} ## More macros can go here
 #
 # McCarthy's paper makes a distinction between forms and functions
 # because we need a clear notation of *how* we apply functions
-# to parameters. McCarthy subexplains it thusly:
+# to parameters. McCarthy explains it thusly:
 #
 # "Let `f` be an expression that stands for a function of two integer 
 # variables. It should make sense to write `f(3, 4)` and the value of this 
@@ -238,8 +274,9 @@ macro_table = {Symbols['let']:let} ## More macros can go here
 # form and the ordered list of arguments of the desired function. 
 # This is accomplished by Church's lambda-notation."
 #
-# Therefore, a `Procedure` object represents a *function*, that is, a lambda 
-# expression. In gazelle, these expressions are written in the form
+# Therefore, a `Procedure` object represents a *function*, that is, 
+# a lambda expression. In gazelle, these expressions are written in 
+# the form
 #   `(lamb (args) (expr))`
 # In addition a `Procedure` knows what environment it was created in
 # and has the ability to make a new internal environment that is created from
@@ -256,140 +293,106 @@ macro_table = {Symbols['let']:let} ## More macros can go here
 # as the environment `func` is defined in will be passed to the `Procedure`
 # object, allowing it to access itself
 class Procedure(object):
-    def __init__(self, parms, body, env):
-        self.parms, self.body, self.env = parms, body, env
+  def __init__(self, params, body, env):
+    self.params, self.body, self.env = params, body, env
 
-    # A `Procedure` is a function, therefore we should be able to
-    # call it as a function with respect to the proper environment
-    # Note that the environment is created each time the procedure is
-    # called
-    def __call__(self, *args): 
-        return eval(self.body, Environment(self.parms, args, self.env))
-
-def callcc(proc):
-    ''' Call proc with current continuation; escape only '''
-    ball = RuntimeWarning("Sorry, can't continue this continuation any longer.")
-    def throw(retval): ball.retval = retval; raise ball
-    try:
-        return proc(throw)
-    except RuntimeWarning as w:
-        if w is ball: return ball.retval
-    else: raise w
-
-### StdEnv
-# An environment with basic procedures
-# -> Environment
-def standard_env():
-    import math
-    import cmath
-    import itertools
-    import operator as op
-    env = Environment()
-    env.update(vars(math))
-    env.update(vars(cmath))
-    env.update(vars(itertools))
-    env.update({
-        '>':          op.gt,     '<':       op.lt,    
-        '>=':         op.ge,     '<=':      op.le,
-        '=':          op.eq,
-        '>>':         op.rshift, '<<':      op.lshift,
-        '+':          lambda *x: reduce(op.add, (x), 0),
-        '-':          lambda *x: x[0] - sum(x[1:]),
-        '*':          lambda *x: reduce(op.mul, (x), 1),
-        '/':          lambda *x: reduce(op.truediv, (x[1:]), x[0]),
-        '//':         lambda *x: reduce(op.floordiv, (x[1:]), x[0]),
-        '%':          op.mod,
-        'abs':        abs,
-        'append':     op.add,
-        'apply':      lambda proc,l: proc(*l),
-        'begin':      lambda *x: x[-1],
-        'bool?':      lambda x: isinstance(x, bool),
-        'call/cc':    callcc,
-        'car':        lambda x: x[0],
-        'cdr':        lambda x: x[1:],
-        'cons':       lambda x,y: [x] + y,
-        'eq?':        op.is_, 
-        'equal?':     op.eq, 
-        'eval':       lambda x: eval(x), 
-        'include':    lambda x: eval(parse(Atomize(open(x)))),
-        'length':     len, 
-        'land':       lambda *x: reduce(op.and_, (x)),
-        'list':       lambda *x: list(x),
-        'list?':      lambda x: isinstance(x,list), 
-        'map':        map,
-        'max':        max,
-        'filter':     filter,
-        'min':        min,
-        'not':        op.not_,
-        'null?':      lambda x: x == [], 
-        'number?':    lambda x: isinstance(x, int) or isinstance(x, float) or isinstance(x, complex),   
-        'or':         op.or_,   
-        'proc?':      callable,
-        'range':      lambda *x: list(range(x[0], x[1])) if len(x) > 1 else list(range(x[0])),
-        'readchar':   lambda *x: input('>'),
-        'readfloat':  lambda *x: float(input('>')),
-        'readint':    lambda *x: int(input('>')),
-        'round':      round,
-        'str?':       lambda x: isinstance(x, str),
-        'sum':        lambda x: sum(x),
-        })
-    return env
-
-global_env = standard_env()
+  # A `Procedure` is a function, therefore we should be able to
+  # call it as a function with respect to the proper environment
+  # Note that the environment is created each time the procedure is
+  # called
+  def __call__(self, *args): 
+    return eval(self.body, Environment(self.params, args, self.env))
 
 ### Eval
 # Evaluate an expression in an environment.
 # Gazelle expression -> Evaluated Gazelle expression
 def eval(expr, env=global_env):
-    "Evaluate an expression in an environment."
-    while True:
-        if isinstance(expr, Symbol):       # variable reference
-            return env.find(expr)[expr]
-        elif not isinstance(expr, list):   # constant literal
-            return expr
+  # TODO: Missing unquote
 
-        procedure = expr[0]
 
-        if procedure is Symbols['quote']:     # (quote subexp)
-            (_, subexp) = expr
-            return subexp
-        elif procedure is Symbols['if']:        # (if test conseq alt)
-            (_, test, conseq, alt) = expr
-            expr = (conseq if eval(test, env) else alt)
-        elif procedure is Symbols['set!']:       # (set! var subexp)
-            (_, var, subexp) = expr
-            env.find(var)[var] = eval(subexp, env)
-            return None
-        elif procedure is Symbols['def']:    # (define var subexp)
-            (_, var, subexp) = expr
-            env[var] = eval(subexp, env)
-            return None
-        elif procedure is Symbols['lamb']:    # (lambda (var*) subexp)
-            (_, vars, subexp) = expr
-            return Procedure(vars, subexp, env)
-        elif procedure is Symbols['begin']:     # (begin subexp+)
-            for subexp in expr[1:-1]:
-                eval(subexp, env)
-            expr = expr[-1]
-        elif procedure== Symbols['check-expect']: # test exact
-            (_, var, subexp) = expr
-            return (eval(var, env) == eval(subexp, env))
-        elif procedure == Symbols['check-within']: # test range
-            (_, var, lower_bound, upper_bound) = expr
-            return ((eval(var, env) <= eval(upper_bound, env) and
-                    (eval(var, env) >= eval(lower_bound, env))))
-        elif procedure == Symbols['member?']: # member?
-            (_, var, lst) = expr
-            return (eval(var, env) in eval(lst, env))
-        elif procedure == Symbols['display']: # display
-            (_, body) = expr
-            print body
-            return None
-        else:                    # (proc subexp*)
-            subexps = [eval(subexp, env) for subexp in expr]
-            proc = subexps.pop(0)
-            if isinstance(proc, Procedure):
-                expr = proc.body
-                env = Environment(proc.parms, subexps, proc.env)
-            else:
-                return proc(*subexps)
+  while True:
+    # variable reference
+    if isinstance(expr, Symbol):
+      return env.find(expr)[expr]
+
+    # constant literal
+    elif not isinstance(expr, list):
+      return expr
+
+    # procedure = (func arg1 arg2 arg3 ...)
+    procedure = expr[0]
+
+    # (quote subexpr)
+    if procedure is Symbols['quote']:     
+      (_, subexpr) = expr
+      return subexpr
+
+    # (if test conseq else)
+    elif procedure is Symbols['if']:        
+      (_, test, conseq, alt) = expr
+      expr = (conseq if eval(test, env) else alt)
+
+    # (set! var expr)
+    elif procedure is Symbols['set!']:      
+      (_, var, subexpr) = expr
+      env.find(var)[var] = eval(subexpr, env)
+      return None
+
+    # (def var expr)
+    elif procedure is Symbols['def']:
+      (_, var, subexpr) = expr
+      env[var] = eval(subexpr, env)
+
+      return None
+    # (lambda (var*) expr)
+    elif procedure is Symbols['lambda']:
+      (_, vars, subexpr) = expr
+      return Procedure(vars, subexpr, env)
+
+    # (begin expr+)
+    elif procedure is Symbols['begin']:
+      for subexpr in expr[1:-1]:
+        eval(subexpr, env)
+      expr = expr[-1]
+
+    # test exact
+    elif procedure == Symbols['check-expect']:
+      (_, var, subexpr) = expr
+      return (eval(var, env) == eval(subexpr, env))
+
+    # test range
+    elif procedure == Symbols['check-within']: 
+      (_, var, lower_bound, upper_bound) = expr
+      return ((eval(var, env) <= eval(upper_bound, env) and
+          (eval(var, env) >= eval(lower_bound, env))))
+    
+    # (member? var list)
+    elif procedure == Symbols['member?']: 
+      (_, var, lst) = expr
+      return (eval(var, env) in eval(lst, env))
+    
+    # (display symbol/var)
+    elif procedure == Symbols['display']:
+      (_, body) = expr
+      print gazellestr(eval(body, env))
+      return None
+
+    # (return exp)
+    elif procedure == Symbols['return']:
+      (_, body) = expr
+      return eval(body, env)
+
+    # (include "filepath")
+    elif procedure == Symbols['include']:
+      (_, file) = expr
+      return eval(parse(Atomizer(open(file))))
+    
+    # (proc expr*)
+    else:                    
+      subexprs = [eval(subexpr, env) for subexpr in expr]
+      proc = subexprs.pop(0)
+      if isinstance(proc, Procedure):
+        expr = proc.body
+        env = Environment(proc.params, subexprs, proc.env)
+      else:
+        return proc(*subexprs)

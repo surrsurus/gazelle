@@ -386,6 +386,15 @@ def eval(expr, env=global_env):
     elif procedure == Symbols['include']:
       (_, file) = expr
       return eval(parse(Atomizer(open(file))))
+
+    # (while cond body)
+    elif procedure == Symbols['while']:
+
+      (_, cond, body) = expr
+      while eval(cond, env):
+        eval(body, env)
+
+      return None
     
     # (proc expr*)
     else:                    

@@ -1,16 +1,44 @@
 (begin
+  ;; Project Euler question 3 answer
+  ;; 3 different procedures for computation
 
-  (def (primefac i f)
-    (if (< i f)
-      (return '())
-      (if (= (% i f) 0)
-        (return (append (list f) (primefac (/ i f) 2)))
-        (return (primefac i (+ f 1)))
-      )
+  ;; Recursive method
+  ;; Breaks python's recursion depth
+  ;; i should be 2 on start
+  (def (primefac-recur-break n i)
+    (if (= (% n i) 0)
+      (return (append (list i) (primefac-recur (/ n i) 2)))
+      (return (primefac-recur n (+ i 1)))
     )
   )
+
+  ;; Another recursive method that doesn't break python
+  ;; i should be 2 on start
+  (def (primefac-recur n i) (begin
+    (if (<= (* i i) n)
+      (if (> (% n i) 0)
+        (primefac-recur n (+ i 1))
+        (primefac-recur (// n i) i)
+      )
+      (return n)
+    )
+  ))
+
+  ;; While loop method
+  ;; The least ideal out of all of them
+  (def (primefac n) (begin
+    (def i 2)
+    (while (<= (* i i) n)
+      (if (> (% n i) 0)
+        (set! i (+ i 1))
+        (set! n (// n i))
+      )
+    )
+    (return n)
+  ))
   
-  ;; Will cause recursion error.
-  (return (max (primefac 600851475143 2)))
+  ;; 6857
+  ;; (display (primefac 600851475143))
+  (display (primefac-recur 600851475143 2))
 
 )

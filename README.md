@@ -24,7 +24,7 @@ Gazelle can be used to write answers to Project Euler questions. Here's problem 
 #### Windows
 
 1. Firstly, you'll need Python 2 which can be downloaded [here](https://www.python.org/downloads/)
-2. You'll then need to download the current master branch from this GitHub
+2. You'll then need to download the [latest release](https://github.com/surrsurus/gazelle/releases)
 3. Then, start the REPL. Run the REPL by running `win-repl.bat` in the directory of `gazelle-master`
 
 #### Linux

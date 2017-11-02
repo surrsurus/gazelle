@@ -36,7 +36,7 @@ Gazelle can be used to write answers to Project Euler questions. Here's problem 
 
 The Gazelle REPL should provide the necessary testing environment for your deercode usage.
 
-In addition, files can be ran by using a file path as your argument such as `py gazelle.py ./euler/one.gel` and files can be run in succession such as `py gazelle.py ./euler/one.gel ./euler/two.gel`
+In addition, files can be ran by using a file path as your argument such as `python gazelle.py ./euler/one.gel` and files can be run in succession such as `python gazelle.py ./euler/one.gel ./euler/two.gel`
 
 ## Code examples
 
@@ -44,7 +44,7 @@ Take a look at the [getting started guide](https://github.com/surrsurus/gazelle/
 
 ## Run Tests
 
-Run the integration tests by executing `./gazelle.py test`
+Run the integration tests by executing `python gazelle.py test`
 
 # Shortcomings
 

@@ -1,6 +1,20 @@
 # gazelle
 Gazelle - A scripting language inspired by LISP and Scheme
 
+# Usage
+
+#### Windows
+
+1. Firstly, you'll need Python 2 which can be downloaded [here](https://www.python.org/downloads/)
+2. Download the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle
+3. Run `win-repl.bat`
+
+#### Linux/Mac OS
+
+1. Install Python 2 with your package manager of choice (though on most linux distros it should be included by default)
+2. Download the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle
+3. Run `linux-repl.sh`
+
 # Why Gazelle?
 Gazelle is:
 - **Easy to setup** 
@@ -19,28 +33,15 @@ Gazelle can be used to write answers to Project Euler questions. Here's problem 
 
 `(return (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))`
 
-# How to use
-
-#### Windows
-
-1. Firstly, you'll need Python 2 which can be downloaded [here](https://www.python.org/downloads/)
-2. You'll then need to download the [latest release](https://github.com/surrsurus/gazelle/releases)
-3. Then, start the REPL. Run the REPL by running `win-repl.bat` in the directory of `gazelle-master`
-
-#### Linux
-
-1. Install Python 2 with your package manager of choice (though on most distros it should be included by default)
-2. Run `linux-repl.sh`
-
 # Basic Usage
 
-The Gazelle REPL should provide the necessary testing environment for your deercode usage.
+The Gazelle REPL provides all the basic utility you need to begin toying with it.
 
 In addition, files can be ran by using a file path as your argument such as `python gazelle.py ./euler/one.gel` and files can be run in succession such as `python gazelle.py ./euler/one.gel ./euler/two.gel`
 
 ## Code examples
 
-Take a look at the [getting started guide](https://github.com/surrsurus/gazelle/wiki/Getting-Started) and our [documentation](https://github.com/surrsurus/gazelle/wiki/Documentation) to learn how to code with deercode. You can view example programs in the [examples folder](https://github.com/surrsurus/gazelle/tree/master/example) packaged with deercode
+Take a look at the [getting started guide](https://github.com/surrsurus/gazelle/wiki/Getting-Started) and our [documentation](https://github.com/surrsurus/gazelle/wiki/Documentation) to learn how to code with Gazelle. You can view example programs in the [examples folder](https://github.com/surrsurus/gazelle/tree/master/example) packaged with Gazelle.
 
 ## Run Tests
 
@@ -48,7 +49,7 @@ Run the integration tests by executing `python gazelle.py test`
 
 # Shortcomings
 
-Gazelle is very much lacking when it comes to efficiency. Gazelle lacks tail-call optimizations and lazy evaluation, two things that would make Gazelle much faster. Python really limits what deercode can do and we're looking to begin porting this to a different language
+Gazelle is very much lacking when it comes to efficiency. Gazelle lacks tail-call optimizations and lazy evaluation, two things that would make Gazelle much faster. Python really limits what Gazelle. can do and we're looking to begin porting this to a different language
 
 In addition, Gazelle is pretty tough to read and the REPL lacks parentheses completion which may hinder your REPL experience.
 

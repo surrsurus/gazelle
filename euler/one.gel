@@ -1,6 +1,6 @@
 (begin
   ;; Project euler question 1 answer
   ;; 233168
-  (display (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))
+  (return (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))
 )
   

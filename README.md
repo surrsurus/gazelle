@@ -1,4 +1,7 @@
 # gazelle
+
+[![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle)
+
 Gazelle - A scripting language inspired by LISP and Scheme
 
 # Usage

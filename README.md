@@ -1,6 +1,6 @@
 # gazelle
 
-[![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle)
+[![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle) ![Language](https://img.shields.io/badge/language-python-yellow.svg) ![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg)  [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
 
 Gazelle - A scripting language inspired by LISP and Scheme
 

@@ -1,6 +1,8 @@
 (begin
-  ;; Project euler question 1 answer
+  ;; Project euler question 1 answer. Return and display for testing.
   ;; 233168
-  (return (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))
+  (def ans (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))
+  (display ans)
+  (return ans)
 )
   

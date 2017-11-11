@@ -1,5 +1,5 @@
 (begin
-  ;; Project Euler question 3 answer
+  ;; Project Euler question 3 answer. Return and display for testing.
   ;; 3 different procedures for computation
 
   ;; Recursive method
@@ -39,6 +39,8 @@
   
   ;; 6857
   ;; (display (primefac 600851475143))
-  (display (primefac-recur 600851475143 2))
+  (def ans (primefac-recur 600851475143 2))
+  (display ans)
+  (return ans)
 
 )

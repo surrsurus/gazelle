@@ -1,7 +1,9 @@
 (begin
-  ;; Project euler question 2 answer
+  ;; Project euler question 2 answer. Return and display for testing.
   ;; 4613732
   ;; Write out fibonacci terms under 4 million to speed up evaluation
   (def fib '(0 1 1 2 3 5 8 13 21 34 55 89 144 233 377 610 987 1597 2584 4181 6765 10946 17711 28657 46368 75025 121393 196418 317811 514229 832040 1346269 2178309 3524578))
-  (display (sum (filter (\ (n) (= (% n 2) 0)) fib))
+  (def ans (sum (filter (\ (n) (= (% n 2) 0)) fib)))
+  (display ans)
+  (return ans)
 )

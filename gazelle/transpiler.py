@@ -4,7 +4,7 @@ import sys
 import colors
 from sym import Symbol, Symbols
 from atomizer import Atomizer
-from gazellestr import convert as gazellestr
+from gazellestr import gazellestr
 from gazelleerr import gazelleerr
 from parseval import eval, parse, gazellestr, global_env
 

@@ -1,7 +1,6 @@
-### GazelleStr
-# Convert a Python object back into a Gazelle-readable string.
 # Object -> Gazelle Expression
-def convert(exp):
+def gazellestr(exp):
+  ''' Convert a Python object back into a Gazelle-readable string. '''
 
   # Bools
   if exp is True: return '#t'
@@ -11,13 +10,13 @@ def convert(exp):
   elif callable(exp):
     try:
       return '(lambda (' + ' '.join([str(x) for x in exp.params]) + \
-        ') (' + ' '.join([convert(x) for x in exp.body]) + '))'
+        ') (' + ' '.join([gazellestr(x) for x in exp.body]) + '))'
     except AttributeError:
       return exp
   
   # Lists
   elif isinstance(exp, list):
-    return '(' + ' '.join(map(convert, exp)) + ')' 
+    return '(' + ' '.join(map(gazellestr, exp)) + ')' 
   
   # Everything else
   else:

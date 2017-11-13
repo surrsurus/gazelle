@@ -363,9 +363,9 @@ suites = [
   (tail_recursion_tests, 'Tail Recursion')
 ]
 
-# Run a test and capture output, comapre it to an expected
-# value
 def capture(expr, expected):
+  ''' Run a test and capture output, comapre it to an expected
+  value. '''
 
   # Attempt to run test normally
   try:
@@ -385,9 +385,9 @@ def capture(expr, expected):
   except TypeError:
     return False
 
-# Test each test case in all suites to 
-# see if Gazelle code is being properly interpreted
-def run():
+def integration_tests():
+  ''' Test each test case in all suites to 
+  see if Gazelle code is being properly interpreted. '''
 
   fails = 0
   tests = 0

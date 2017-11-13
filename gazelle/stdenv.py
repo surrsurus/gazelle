@@ -1,7 +1,7 @@
 from env import Environment
 
-# Call proc with current continuation; escape only
 def callcc(proc):
+  ''' Call proc with current continuation; escape only '''
   ball = RuntimeWarning('Sorry, can\'t continue this continuation any longer.')
   def throw(retval): ball.retval = retval; raise ball
   try:
@@ -11,17 +11,21 @@ def callcc(proc):
   else: raise w
 
 ### StdEnv
-# An environment with basic procedures
-# -> Environment
+# None -> Environment
 def make_env():
+  ''' An environment with basic procedures. '''
+
   import math
   import cmath
   import itertools
   import operator as op
+
   env = Environment()
+  
   env.update(vars(math))
   env.update(vars(cmath))
   env.update(vars(itertools))
+
   env.update({
     '>':          op.gt,     '<':       op.lt,    
     '>=':         op.ge,     '<=':      op.le,

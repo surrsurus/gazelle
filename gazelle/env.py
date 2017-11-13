@@ -1,4 +1,4 @@
-from gazellestr import convert as gazellestr
+from gazellestr import gazellestr
 from sym import Symbol
 
 ### Environment
@@ -9,9 +9,11 @@ from sym import Symbol
 # that is, a simple key/value relation where the key is a string
 # representation of the value which may be an atom, a list, or a procedure
 class Environment(dict):
+
   def __init__(self, params=(), args=(), outer=None):
-    # Bind param list to corresponding args, or 
-    # single param to list of args
+    ''' Bind param list to corresponding args, or 
+    single param to list of args. '''
+
     self.outer = outer
     if isinstance(params, Symbol): 
       self.update({params:list(args)})
@@ -21,8 +23,9 @@ class Environment(dict):
           % (gazellestr(params), gazellestr(args)))
       self.update(zip(params,args))
 
-  # Find the innermost Environment where var appears
   def find(self, var):
+    ''' Find the innermost Environment where var appears. '''
+
     if var in self: return self
     elif self.outer is None: raise LookupError(var)
     else: return self.outer.find(var)

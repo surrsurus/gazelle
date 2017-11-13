@@ -7,9 +7,10 @@
 # integer, float, or complex number, therefore it must be a string
 class Symbol(str): pass
 
-# Find or create unique Symbol entry for str s in symbol table
 # String, (Dict) -> Atom
 def Sym(s, symbol_table={}):
+  ''' Find or create unique Symbol entry for str s in symbol table. '''
+  
   if s not in symbol_table: symbol_table[s] = Symbol(s)
   return symbol_table[s]
 

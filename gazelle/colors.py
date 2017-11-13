@@ -21,6 +21,6 @@ if os.name != 'nt':
   FAIL = '\033[91m'
   ENDC = '\033[0m'
 
-# Print a string and format it with a color
 def printf(string, color):
+  ''' Print a string and format it with a color. '''
   print color + string + ENDC

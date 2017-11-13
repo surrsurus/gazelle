@@ -2,8 +2,8 @@ import sys
 
 # Local deps
 from atomizer import Atomizer
+from integration_tests import integration_tests
 import repl
-import integration_tests
 import transpiler
 
 ### CLI
@@ -11,8 +11,9 @@ import transpiler
 # the user is trying to perform. Based on the arguments, we
 # can either load files, start the REPL, or run the tests.
 
-# Examine the commandline arguments and determine what to do
-def start():
+# None -> None
+def cli():
+  ''' Examine the commandline arguments and determine what to do. '''
 
   # Load stdlib
   repl.capture_parseval(Atomizer(open('./lib/stdlib.gel')))
@@ -25,8 +26,9 @@ def start():
 
   # Run tests
   elif len(sys.argv) > 1 and (sys.argv[1] == 'test'):
-    integration_tests.run()
+    integration_tests()
 
+  # Transpile
   elif len(sys.argv) > 1 and (sys.argv[1] == 'transpile'):
     transpiler.run(sys.argv[2:])
 

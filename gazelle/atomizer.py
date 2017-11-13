@@ -10,27 +10,26 @@ Tokenizer = r"""\s*(,@|[('`,)]|"(?:[\\].|[^\\"])*"|;.*|[^\s('"`,;)]*)(.*)"""
 # present within a string
 ContainsNum = re.compile('\d')
 
-# The `Atomizer` class takes an input object, typically a string or file,
-# and turns it into a bunch of atoms via `read()`
-#
-# An atomized gazelle expression consists of expressions that 
-# consist of atoms and lists. These lists and atoms then become
-# expanded into symbols and procedures through the parser.
-#
-# In reality, these lists and atoms are to become python objects.
-# We essentially perform the action of gazelle syntax -> python object
-# and reason about it using lisp terms. We do this to make evaluation
-# and parsing easier later on.
 class Atomizer(object):
-  ''' Takes an input object (string or file) and holds methods of
-    reading gazelle expressions from it by first tokenizing
-    then atomizing it '''
+  '''The `Atomizer` class takes an input object, typically a string or file,
+  and turns it into a bunch of atoms via `read()`
+
+  An atomized gazelle expression consists of expressions that 
+  consist of atoms and lists. These lists and atoms then become
+  expanded into symbols and procedures through the parser.
+
+  In reality, these lists and atoms are to become python objects.
+  We essentially perform the action of gazelle syntax -> python object
+  and reason about it using lisp terms. We do this to make evaluation
+  and parsing easier later on.'''
+
   def __init__(self, file):
     self.file = file; self.line = ''
 
-  # Return the next token from the input based on the tokenizer
-  # -> Token
+  # self -> Token
   def next_token(self):
+    ''' Return the next token from the input based on the tokenizer '''
+
     while True:
       if self.line == '': 
         self.line = self.file.readline()
@@ -64,17 +63,18 @@ class Atomizer(object):
   # faster in parsing and evaluation since we don't need to declare
   # new objects.
 
-  # Based on the input object, read from it an expression that consists
-  # of purely lists and atoms. This is an atomized expression
-  # that needs to be expanded for proper evaluation
-  # -> Atomized Gazelle Expression
+  # self -> Atomized Gazelle Expression
   def read(self):
+    ''' Based on the input object, read from it an expression that consists
+    of purely lists and atoms. This is an atomized expression
+    that needs to be expanded for proper evaluation. '''
 
-    # The `read_ahead` function simply takes a token read
-    # from the input object and finds lists, quotes, eofs,
-    # and atoms
     # Token -> Atom
     def read_ahead(token):
+      ''' The `read_ahead` function simply takes a token read
+      from the input object and finds lists, quotes, eofs,
+      and atoms. '''
+
       # Lparen means that a list has begun
       if '(' == token: 
         L = []
@@ -96,12 +96,12 @@ class Atomizer(object):
     token1 = self.next_token()
     return eof if token1 is eof else read_ahead(token1)
 
-  # Will take something that is not a list and determine what the equivalent
-  # python object is. Since a token is a string, we need to turn them
-  # into their python object equivalence though this involves a less than
-  # ideal solution of using try/except
   # Token -> Atom
   def atom(self, token):
+    ''' Will take something that is not a list and determine what the equivalent
+    python object is. Since a token is a string, we need to turn them
+    into their python object equivalence though this involves a less than
+    ideal solution of using try/except. '''
 
     # Typically, #t and #f are either symbols or empty lists,
     # though in gazelle we can read these tokens and return the proper

@@ -1,15 +1,14 @@
 # Local deps
 from atomizer import Atomizer
 from env import Environment
-from gazellestr import convert as gazellestr
+from gazellestr import gazellestr
 from stdenv import global_env
 from sym import eof, Symbol, Symbols, Quotes
 
 ### Parser
-
-# Parse a program: read and expand/error-check it
-# atomizer -> Gazelle Expression
+# Atomizer -> Gazelle Expression
 def parse(atomizer):
+  ''' Parse a program: read and expand/error-check it '''
 
   # Backwards compatibility: given a str, convert it to an atomizer
   import StringIO
@@ -18,17 +17,17 @@ def parse(atomizer):
 
   return expand(atomizer.read(), toplevel=True)
 
-# Expand turns an atomized gazelle expression into an expression
-# that is readily readable by `eval()`. You can view this as
-# sort of making an AST, though it's more like something
-# that optimizes and expands syntactic sugar. This also checks
-# syntax for any errors
 # Atomized Gazelle Expression, (Boolean) -> Gazelle Expression
-#
-# We can't just name this parse and expect it to work with the atomizer
-# object. It recursively looks at the expression and changes it,
-# so it would not work at all with the way the `Atomizer` class works
 def expand(expr, toplevel=False):
+  ''' Expand turns an atomized gazelle expression into an expression
+  that is readily readable by `eval()`. You can view this as
+  sort of making an AST, though it's more like something
+  that optimizes and expands syntactic sugar. This also checks
+  syntax for any errors.
+  
+  We can't just name this parse and expect it to work with the atomizer
+  object. It recursively looks at the expression and changes it,
+  so it would not work at all with the way the `Atomizer` class works. '''
 
   # Our input expression should not be an empty list
   # () => Error
@@ -204,9 +203,9 @@ def expand(expr, toplevel=False):
     # (f arg...) => expand each
     return map(expand, expr)
 
-# Expand `expr => 'expr; `,expr => expr; `(,@expr y) => (append expr y)
 # Gazelle Expression -> Gazelle Expression
 def expand_quasiquote(expr):
+  ''' Expand `expr => 'expr; `,expr => expr; `(,@expr y) => (append expr y) '''
 
   if not (expr != [] and isinstance(expr, list)):
     return [Symbols['quote'], expr]
@@ -236,6 +235,8 @@ def expand_quasiquote(expr):
 
 # Arguments -> Gazelle Expression
 def let(*args):
+  ''' Let macro '''
+
   args = list(args)
   expr = [Symbols['let']] + args
 
@@ -296,19 +297,19 @@ class Procedure(object):
   def __init__(self, params, body, env):
     self.params, self.body, self.env = params, body, env
 
-  # A `Procedure` is a function, therefore we should be able to
-  # call it as a function with respect to the proper environment
-  # Note that the environment is created each time the procedure is
-  # called
   def __call__(self, *args): 
+    ''' A `Procedure` is a function, therefore we should be able to
+    call it as a function with respect to the proper environment
+    Note that the environment is created each time the procedure is
+    called. '''
+
     return eval(self.body, Environment(self.params, args, self.env))
 
 ### Eval
-# Evaluate an expression in an environment.
 # Gazelle expression -> Evaluated Gazelle expression
 def eval(expr, env=global_env):
+  ''' Evaluate an expression in an environment. '''
   # TODO: Missing unquote
-
 
   while True:
     # variable reference

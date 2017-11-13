@@ -20,6 +20,8 @@ Not convinced? Gazelle can be used to write answers to Project Euler questions. 
 
 ## Getting Started
 
+Here's how you can get started programming in Gazelle.
+
 ### Prerequisites
 
 Before you can run Gazelle, you'll need to have [Python 2.7](https://www.python.org/downloads/) installed for your respective OS. Then, make sure to download either the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle or the latest master.

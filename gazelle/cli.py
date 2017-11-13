@@ -4,6 +4,7 @@ import sys
 from atomizer import Atomizer
 import repl
 import integration_tests
+import transpiler
 
 ### CLI
 # The commandline interface helps determine what action
@@ -25,6 +26,9 @@ def start():
   # Run tests
   elif len(sys.argv) > 1 and (sys.argv[1] == 'test'):
     integration_tests.run()
+
+  elif len(sys.argv) > 1 and (sys.argv[1] == 'transpile'):
+    transpiler.run(sys.argv[2:])
 
   # Evaluate Files
   #  repl will rep all files after the program name such as:

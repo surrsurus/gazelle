@@ -6,13 +6,13 @@ python:
   - "3.5"
   - "3.6"
 matrix:
-  # It's ok if our code fails on unstable development versions of Go.
+  # It's ok if our code fails on deprecated versions of Python.
   allow_failures:
     - python: "2.6"
     - python: "2.7"
-  # Don't wait for tip tests to finish. Mark the test run green if the
-  # tests pass on the stable versions of Go.
+  # Mark the test run green if the
+  # tests pass on Python 3
   fast_finish: true
 
 # command to run tests
-script: python2 run_tests.py
+script: python3 run_tests.py

@@ -46,7 +46,7 @@ In addition, files can be ran by using a file path as your argument such as `pyt
 
 ### Running the Tests
 
-To run the tests, pass the argument `test` to `gazelle.py`. On windows this would be `python gazelle.py test` and on Linux/OSX it would be `python2 gazelle.py test`
+To run the tests, run the `run_tests.py` file from the root directory.
 
 ### Code Examples
 

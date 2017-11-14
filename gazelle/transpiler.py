@@ -1,3 +1,9 @@
+'''
+
+Transpiler skeleton. Probably won't be touching this for a good while
+
+'''
+
 import sys
 
 # Local deps

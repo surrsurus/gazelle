@@ -3,7 +3,6 @@ import sys
 # Local deps
 from atomizer import Atomizer
 import repl
-import transpiler
 
 ### CLI
 # The commandline interface helps determine what action
@@ -22,10 +21,6 @@ def cli():
   #  `./gazelle.py` or `py gazelle.py` or `python gazelle.py `
   if len(sys.argv) == 1:
     repl.run()
-
-  # # Transpile
-  # elif len(sys.argv) > 1 and (sys.argv[1] == 'transpile'):
-  #   transpiler.run(sys.argv[2:])
 
   # Evaluate Files
   #  repl will rep all files after the program name such as:

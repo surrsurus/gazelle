@@ -1,7 +1,7 @@
 import re
 
 # Local deps
-from .sym import eof, Sym, Quotes
+from sym import eof, Sym, Quotes
 
 # A regex that we use to tokenize a string
 Tokenizer = r"""\s*(,@|[('`,)]|"(?:[\\].|[^\\"])*"|;.*|[^\s('"`,;)]*)(.*)"""
@@ -111,7 +111,7 @@ class Atomizer(object):
 
     # if it isn't a boolean value, it could be a string
     # wrapped in double quotes
-    elif token[0] == '"': return token[1:-1]
+    elif token[0] == '"': return token[1:-1].decode('string_escape')
 
     # TODO: The act of determining if a token is something like 
     # `123foobar` is potentially costly towards computation time

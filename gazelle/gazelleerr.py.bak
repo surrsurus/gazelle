@@ -1,4 +1,4 @@
-from . import colors
+import colors
 
 # Error -> String
 def gazelleerr(e):

@@ -1,8 +1,8 @@
 import sys
 
 # Local deps
-from .atomizer import Atomizer
-from . import repl
+from atomizer import Atomizer
+import repl
 
 ### CLI
 # The commandline interface helps determine what action

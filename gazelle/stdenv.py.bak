@@ -1,5 +1,4 @@
-from .env import Environment
-from functools import reduce
+from env import Environment
 
 def callcc(proc):
   ''' Call proc with current continuation; escape only '''
@@ -47,12 +46,12 @@ def make_env():
     'car':        lambda x: x[0],
     'cdr':        lambda x: x[1:],
     'cons':       lambda x,y: [x] + y,
-    'filter':     lambda f,l: list(filter(f, l)),
+    'filter':     filter,
     'length':     len, 
     'list':       lambda *x: list(x),
     'list?':      lambda x: isinstance(x,list), 
     # Map can be defined in the stdlib, though it will max out python's recursion depth
-    'map':        lambda f,l: list(map(f, l)),
+    'map':        map,
     'max':        max,
     'min':        min,
     'not':        op.not_,

@@ -1,4 +1,3 @@
-import collections
 # Object -> Gazelle Expression
 def gazellestr(exp):
   ''' Convert a Python object back into a Gazelle-readable string. '''
@@ -8,7 +7,7 @@ def gazellestr(exp):
   elif exp is False: return '#f'
 
   # Procedures
-  elif isinstance(exp, collections.Callable):
+  elif callable(exp):
     try:
       return '(lambda (' + ' '.join([str(x) for x in exp.params]) + \
         ') (' + ' '.join([gazellestr(x) for x in exp.body]) + '))'

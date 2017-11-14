@@ -374,20 +374,20 @@ def capture(expr, expected):
   # Attempt to run test normally
   try:
     result = eval(parse(expr))
-    print('[:] ', expr, '=>', (result))
+    print '[:] ', expr, '=>', (result)
     return (result == expected)
   # Tests can raise exceptions, so capture them slightly differently
   except Exception as e:
-    print('[#] ', expr, '=raises=>', type(e).__name__, e)
-    # `issubclass` might not work on some tests, so we just capture any
-    # TypeErrors and return false because that that point the test definitely
-    # failed
-    try:
-      # Since we look for exceptions let's properly capture them and not
-      # return False prematurely
-      return issubclass(expected, Exception) and isinstance(e, expected)
-    except TypeError:
-      return False
+    print '[#] ', expr, '=raises=>', type(e).__name__, e
+  # `issubclass` might not work on some tests, so we just capture any
+  # TypeErrors and return false because that that point the test definitely
+  # failed
+  try:
+    # Since we look for exceptions let's properly capture them and not
+    # return False prematurely
+    return issubclass(expected, Exception) and isinstance(e, expected)
+  except TypeError:
+    return False
 
 def integration_tests():
   ''' Test each test case in all suites to 

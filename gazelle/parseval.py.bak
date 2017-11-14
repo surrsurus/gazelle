@@ -1,10 +1,9 @@
 # Local deps
-from .atomizer import Atomizer
-from .env import Environment
-from .gazellestr import gazellestr
-from .stdenv import global_env
-from .sym import eof, Symbol, Symbols, Quotes
-import collections
+from atomizer import Atomizer
+from env import Environment
+from gazellestr import gazellestr
+from stdenv import global_env
+from sym import eof, Symbol, Symbols, Quotes
 
 ### Parser
 # Atomizer -> Gazelle Expression
@@ -12,9 +11,9 @@ def parse(atomizer):
   ''' Parse a program: read and expand/error-check it '''
 
   # Backwards compatibility: given a str, convert it to an atomizer
-  import io
+  import StringIO
   if isinstance(atomizer, str): 
-    atomizer = Atomizer(io.StringIO(atomizer))
+    atomizer = Atomizer(StringIO.StringIO(atomizer))
 
   return expand(atomizer.read(), toplevel=True)
 
@@ -71,7 +70,7 @@ def expand(expr, toplevel=False):
       raise SyntaxError(gazellestr(expr) + ': if statement has recieved '
         + str(len(expr) - 1) + ' arguments, not 2 or 3')
 
-    return list(list(map(expand, expr)))
+    return map(expand, expr)
 
   # Make sure we are only applying set! to a symbol
   # (set! var expr)
@@ -145,7 +144,7 @@ def expand(expr, toplevel=False):
 
         proc = eval(exp)
 
-        if not isinstance(proc, collections.Callable):
+        if not callable(proc):
           raise SyntaxError(gazellestr(expr) + 
             ': macro must be a procedure, not an atom or list')   
         
@@ -202,7 +201,7 @@ def expand(expr, toplevel=False):
   # Otherwise we need to keep expanding the expression
   else:
     # (f arg...) => expand each
-    return list(list(map(expand, expr)))
+    return map(expand, expr)
 
 # Gazelle Expression -> Gazelle Expression
 def expand_quasiquote(expr):
@@ -249,9 +248,9 @@ def let(*args):
   if not all(isinstance(b, list) and len(b)==2 and isinstance(b[0], Symbol) for b in bindings):
     raise SyntaxError(gazellestr(expr) + ': let was given an illegal binding list')
 
-  var, vals = list(zip(*bindings))
+  var, vals = zip(*bindings)
 
-  return [[Symbols['lambda'], list(var)]+list(map(expand, body))] + list(map(expand, vals))
+  return [[Symbols['lambda'], list(var)]+map(expand, body)] + map(expand, vals)
 
 macro_table = {Symbols['let']:let} ## More macros can go here
 
@@ -376,7 +375,7 @@ def eval(expr, env=global_env):
     # (display symbol/var)
     elif procedure == Symbols['display']:
       (_, body) = expr
-      print(gazellestr(eval(body, env)))
+      print gazellestr(eval(body, env))
       return None
 
     # (return exp)

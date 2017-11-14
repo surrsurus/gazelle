@@ -1,8 +1,8 @@
 # Local deps
-from . import colors
-from .gazellestr import gazellestr
-from .gazelleerr import gazelleerr
-from .parseval import eval, parse, gazellestr, global_env
+import colors
+from gazellestr import gazellestr
+from gazelleerr import gazelleerr
+from parseval import eval, parse, gazellestr, global_env
 
 def capture_parseval(expression):
   ''' Parse, Eval and capture any errors. '''
@@ -31,7 +31,7 @@ def run(prompt='gel> ', subprompt='> '):
   try:
     while True:
       
-      inpt = input(prompt)
+      inpt = raw_input(prompt)
 
       if inpt == "quit": break
 
@@ -40,11 +40,11 @@ def run(prompt='gel> ', subprompt='> '):
       # it on the next line
       while list(inpt)[0] == '(' and inpt.count('(') != inpt.count(')'):
         inpt += ' ' # Lack of an extra space may cause some programs to fail
-        inpt += input((len(prompt)-len(subprompt)) * ' ' + subprompt)
+        inpt += raw_input((len(prompt)-len(subprompt)) * ' ' + subprompt)
 
-      val = debug_capture_parseval(inpt)
+      val = capture_parseval(inpt)
 
       if val is not None:
-        print(gazellestr(val))
+        print gazellestr(val)
   except KeyboardInterrupt:
     pass

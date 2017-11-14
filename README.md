@@ -1,4 +1,4 @@
-# gazelle [![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle) ![Python Version](https://img.shields.io/badge/python-3.7-green.svg)  [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
+# gazelle [![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle) ![Python Version](https://img.shields.io/badge/python-3.6-green.svg)  [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
 
 Gazelle is a tiny lisp-like scripting language built with Python.  
 

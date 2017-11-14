@@ -1,10 +1,10 @@
-# gazelle [![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle) ![Python Version](https://img.shields.io/badge/python-2.7-green.svg)  [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
+# gazelle [![Build Status](https://travis-ci.org/surrsurus/gazelle.svg?branch=master)](https://travis-ci.org/surrsurus/gazelle) ![Python Version](https://img.shields.io/badge/python-3.7-green.svg)  [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) 
 
 Gazelle is a tiny lisp-like scripting language built with Python.  
 
 Gazelle is:
 - **Easy to setup** 
-  - Have Python 2? You can run Gazelle. Gazelle requires no external dependencies (that shouldn't be already downloaded)
+  - Have Python? You can run Gazelle. Gazelle requires no external dependencies (that shouldn't be already downloaded)
 - **Inspired by LISP and Scheme**
   - Gazelle code is written entirely with prefix notation in the form `(procedure expression)`
   - Gazelle has no true AST, instead the programmer ends up directly coding the AST for Gazelle to interpret
@@ -24,7 +24,7 @@ Here's how you can get started programming in Gazelle.
 
 ### Prerequisites
 
-Before you can run Gazelle, you'll need to have [Python 2.7](https://www.python.org/downloads/) installed for your respective OS. Then, make sure to download either the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle or the latest master.
+Before you can run Gazelle, you'll need to have [Python 3.7](https://www.python.org/downloads/) installed for your respective OS. Then, make sure to download either the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle or the latest master.
 
 ### Running Gazelle
 

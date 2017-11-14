@@ -42,9 +42,12 @@ def run(prompt='gel> ', subprompt='> '):
         inpt += ' ' # Lack of an extra space may cause some programs to fail
         inpt += input((len(prompt)-len(subprompt)) * ' ' + subprompt)
 
-      val = debug_capture_parseval(inpt)
+      val = capture_parseval(inpt)
 
       if val is not None:
         print(gazellestr(val))
-  except KeyboardInterrupt:
-    pass
+  except Exception as e:
+    if isinstance(e, KeyboardInterrupt) or isinstance(e, EOFError):
+      pass
+    else:
+      raise e

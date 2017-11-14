@@ -13,9 +13,6 @@ from . import repl
 def cli():
   ''' Examine the commandline arguments and determine what to do. '''
 
-  # Load stdlib
-  repl.capture_parseval(Atomizer(open('./lib/stdlib.gel')))
-
   # Start Repl
   #  repl starts under the condition :
   #  `./gazelle.py` or `py gazelle.py` or `python gazelle.py `

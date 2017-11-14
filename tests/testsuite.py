@@ -318,8 +318,7 @@ stdenv_tests = [
 
 # Test methods in the standard library
 stdlib_tests = [
-  # Has no read attribute, so it will throw an AttributeError if it works.
-  (repl.capture_parseval(Atomizer(open('./lib/stdlib.gel'))), AttributeError),
+  ('(stdlib)', None),
   ('(and 1 2 3)', 3), 
   ('(and (> 2 1) 2 3)', 3), 
   ('(and)', True),

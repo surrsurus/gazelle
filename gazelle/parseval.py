@@ -354,7 +354,7 @@ def eval(expr, env=global_env):
     # (begin expr+)
     elif procedure is Symbols['begin']:
       for subexpr in expr[1:-1]:
-        eval(subexpr, env)
+        eval(expand(subexpr), env)
       expr = expr[-1]
 
     # test exact
@@ -387,7 +387,12 @@ def eval(expr, env=global_env):
     # (include "filepath")
     elif procedure == Symbols['include']:
       (_, file) = expr
-      return eval(parse(Atomizer(open(file))))
+      return eval(parse(Atomizer(open(file))), env)
+
+    # (stdlib)
+    elif procedure == Symbols['stdlib']:
+      eval(parse(Atomizer(open('./lib/stdlib.gel'))), env)
+      return None
 
     # (while cond body)
     elif procedure == Symbols['while']:

@@ -2,6 +2,7 @@
   ;; The fizzbuzz problem in Gazelle
   ;; `fb-check` checks whether or not a number is fizzbuzz-compliant
   ;; the `fizzbuzz` procedure will then map fb-check to a list of numbers
+  (stdlib)
   (def fb-check (\ (n) (if (and (= (% n 5) 0) (= (% n 3) 0)) (return "fizzbuzz") (if (= (% n 5) 0) (return "buzz") (if (= (% n 3) 0) (return "fizz") (return n))))))
   (def fizzbuzz (\ (n) (map fb-check (range n))))
   (display (fizzbuzz 100))

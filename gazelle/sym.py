@@ -35,6 +35,7 @@ Symbols = {
   'quote':           Sym('quote'),
   'return':          Sym('return'),
   'set!':            Sym('set!'),
+  'stdlib':          Sym('stdlib'),
   'unquote':         Sym('unquote'),
   'unquotesplicing': Sym('unquotesplicing'),
   'while':           Sym('while'),

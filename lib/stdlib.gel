@@ -8,9 +8,9 @@
 
   ;; And macro
   (macro and (\ args 
-  (if (nil? args) #t
-    (if (= (length args) 1) (car args)
-      `(if ,(car args) (and ,@(cdr args)) #f)))))
+    (if (nil? args) #t
+      (if (= (length args) 1) (car args)
+        `(if ,(car args) (and ,@(cdr args)) #f)))))
 
   ;; Most implementations of a lisp-like lang
   ;; have `car`/`cdr` combinations nested 4 deep

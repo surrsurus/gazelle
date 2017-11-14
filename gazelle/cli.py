@@ -2,7 +2,6 @@ import sys
 
 # Local deps
 from atomizer import Atomizer
-from integration_tests import integration_tests
 import repl
 import transpiler
 
@@ -24,13 +23,9 @@ def cli():
   if len(sys.argv) == 1:
     repl.run()
 
-  # Run tests
-  elif len(sys.argv) > 1 and (sys.argv[1] == 'test'):
-    integration_tests()
-
-  # Transpile
-  elif len(sys.argv) > 1 and (sys.argv[1] == 'transpile'):
-    transpiler.run(sys.argv[2:])
+  # # Transpile
+  # elif len(sys.argv) > 1 and (sys.argv[1] == 'transpile'):
+  #   transpiler.run(sys.argv[2:])
 
   # Evaluate Files
   #  repl will rep all files after the program name such as:

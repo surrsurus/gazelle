@@ -1,5 +1,7 @@
-import colors
-from parseval import eval, parse
+from gazelle import colors
+from gazelle.parseval import eval, parse
+from gazelle.atomizer import Atomizer
+import gazelle.repl as repl
 
 # Test builtin procedures
 builtins_test = [
@@ -316,6 +318,8 @@ stdenv_tests = [
 
 # Test methods in the standard library
 stdlib_tests = [
+  # Has no read attribute, so it will throw an AttributeError if it works.
+  (repl.capture_parseval(Atomizer(open('./lib/stdlib.gel'))), AttributeError),
   ('(and 1 2 3)', 3), 
   ('(and (> 2 1) 2 3)', 3), 
   ('(and)', True),

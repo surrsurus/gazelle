@@ -11,7 +11,9 @@ Tokenizer = r"""\s*(,@|[('`,)]|"(?:[\\].|[^\\"])*"|;.*|[^\s('"`,;)]*)(.*)"""
 ContainsNum = re.compile('\d')
 
 class Atomizer(object):
-  '''The `Atomizer` class takes an input object, typically a string or file,
+  
+  '''
+  The `Atomizer` class takes an input object, typically a string or file,
   and turns it into a bunch of atoms via `read()`
 
   An atomized gazelle expression consists of expressions that 
@@ -21,7 +23,8 @@ class Atomizer(object):
   In reality, these lists and atoms are to become python objects.
   We essentially perform the action of gazelle syntax -> python object
   and reason about it using lisp terms. We do this to make evaluation
-  and parsing easier later on.'''
+  and parsing easier later on.
+  '''
 
   def __init__(self, file):
     self.file = file; self.line = ''
@@ -33,9 +36,8 @@ class Atomizer(object):
     while True:
       if self.line == '': 
         self.line = self.file.readline()
-        
-      if self.line == '': 
-        return eof
+        if self.line == '': 
+          return eof
 
       token, self.line = re.match(Tokenizer, self.line).groups()
 

@@ -32,7 +32,7 @@ For more detail, check out the [getting started guide](https://github.com/surrsu
 
 #### Windows
 
-To run the repl, you can run `win-repl.bat` in the root directory of Gazelle. You could also run `python gazelle.py`.
+To run the repl, run `python gazelle.py` in the root directory from the commandline. On linux/OSX this might be `python3 gazelle.py`
 
 #### Linux/OSX
 
@@ -42,11 +42,17 @@ To run the repl on linux/OSX, you can run `linux-repl.bat` in the root directory
 
 The Gazelle REPL provides all the basic utility you need to begin toying with it.
 
-In addition, files can be ran by using a file path as your argument such as `python gazelle.py ./example/one.gel` and files can be run in succession such as `python gazelle.py ./euler/one.gel ./euler/two.gel`
+In addition, files can be ran by using a file path as your argument such as `python gazelle.py ./example/euler/one.gel` and files can be run in succession such as `python gazelle.py ./example/euler/one.gel ./example/euler/two.gel`
 
 ### Running the Tests
 
-To run the tests, run the `run_tests.py` file from the root directory.
+First, install the testing requirements.
+
+```
+pip install -r requirements.txt
+```
+
+To run the tests, run `pytest tests/testsuite.py` from the root directory. This will start the tests and get benchmarking data.
 
 ### Code Examples
 
@@ -64,8 +70,7 @@ This code is released under the GNU GENERAL PUBLIC LICENSE. All works in this re
 
 ## Acknowledgements
 
-Inspiration from [here](http://norvig.com/lispy2.html)
-
-And the original [LISP paper by McCarthy](http://www-formal.stanford.edu/jmc/recursive.html)
+  - Inspiration from [here](http://norvig.com/lispy2.html)
+  - The original [LISP paper by McCarthy](http://www-formal.stanford.edu/jmc/recursive.html)
 
 

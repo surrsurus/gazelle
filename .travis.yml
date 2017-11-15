@@ -1,18 +1,12 @@
 language: python
 python:
-  - "2.6"
-  - "2.7"
   - "3.4"
   - "3.5"
   - "3.6"
-matrix:
-  # It's ok if our code fails on deprecated versions of Python.
-  allow_failures:
-    - python: "2.6"
-    - python: "2.7"
-  # Mark the test run green if the
-  # tests pass on Python 3
-  fast_finish: true
+
+# command to install dependencies
+install:
+  - pip install -r requirements.txt
 
 # command to run tests
-script: python3 run_tests.py
+script: pytest ./tests/testsuite.py

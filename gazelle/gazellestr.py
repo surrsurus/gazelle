@@ -1,11 +1,13 @@
 import collections
+
 # Object -> Gazelle Expression
 def gazellestr(exp):
   ''' Convert a Python object back into a Gazelle-readable string. '''
 
   # Bools
-  if exp is True: return '#t'
-  elif exp is False: return '#f'
+  if isinstance(exp, bool):
+    if exp: return '#t'
+    else: return '#f'
 
   # Procedures
   elif isinstance(exp, collections.Callable):
@@ -20,5 +22,4 @@ def gazellestr(exp):
     return '(' + ' '.join(map(gazellestr, exp)) + ')' 
   
   # Everything else
-  else:
-    return str(exp)
+  return str(exp)

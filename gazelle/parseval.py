@@ -4,24 +4,28 @@ from .env import Environment
 from .gazellestr import gazellestr
 from .stdenv import global_env
 from .sym import eof, Symbol, Symbols, Quotes
-import collections
+import collections, io
 
 ### Parser
 # Atomizer -> Gazelle Expression
-def parse(atomizer):
+def parse(atomizer, file=False):
   ''' Parse a program: read and expand/error-check it '''
 
-  # Backwards compatibility: given a str, convert it to an atomizer
-  import io
-  if isinstance(atomizer, str): 
-    atomizer = Atomizer(io.StringIO(atomizer))
+  if file:
+    
+    atomizer = Atomizer(open(atomizer))
 
+  else:
+    
+    # Backwards compatibility: given a str, convert it to an atomizer
+    atomizer = Atomizer(io.StringIO(atomizer))
+  
   return expand(atomizer.read(), toplevel=True)
 
 # Atomized Gazelle Expression, (Boolean) -> Gazelle Expression
 def expand(expr, toplevel=False):
   ''' Expand turns an atomized gazelle expression into an expression
-  that is readily readable by `eval()`. You can view this as
+  that is readily readable by `gazeval()`. You can view this as
   sort of making an AST, though it's more like something
   that optimizes and expands syntactic sugar. This also checks
   syntax for any errors.
@@ -143,7 +147,7 @@ def expand(expr, toplevel=False):
           raise SyntaxError(gazellestr(expr) + 
             ': macros can only be defined at the top level') 
 
-        proc = eval(exp)
+        proc = gazeval(exp)
 
         if not isinstance(proc, collections.Callable):
           raise SyntaxError(gazellestr(expr) + 
@@ -244,14 +248,14 @@ def let(*args):
   if len(args) <= 1:
     raise SyntaxError(gazellestr(expr) + ': let expects greater than 1 argument')
 
-  bindings, body = args[0], args[1:]
+  # bindings, body = args[0], args[1:]
 
-  if not all(isinstance(b, list) and len(b)==2 and isinstance(b[0], Symbol) for b in bindings):
+  if not all(isinstance(b, list) and len(b)==2 and isinstance(b[0], Symbol) for b in args[0]):
     raise SyntaxError(gazellestr(expr) + ': let was given an illegal binding list')
 
-  var, vals = list(zip(*bindings))
+  var, vals = list(zip(*args[0]))
 
-  return [[Symbols['lambda'], list(var)]+list(map(expand, body))] + list(map(expand, vals))
+  return [[Symbols['lambda'], list(var)]+list(map(expand, args[1:]))] + list(map(expand, vals))
 
 macro_table = {Symbols['let']:let} ## More macros can go here
 
@@ -304,11 +308,11 @@ class Procedure(object):
     Note that the environment is created each time the procedure is
     called. '''
 
-    return eval(self.body, Environment(self.params, args, self.env))
+    return gazeval(self.body, Environment(self.params, args, self.env))
 
-### Eval
+### gazeval
 # Gazelle expression -> Evaluated Gazelle expression
-def eval(expr, env=global_env):
+def gazeval(expr, env=global_env):
   ''' Evaluate an expression in an environment. '''
   # TODO: Missing unquote
 
@@ -326,86 +330,86 @@ def eval(expr, env=global_env):
 
     # (quote subexpr)
     if procedure is Symbols['quote']:     
-      (_, subexpr) = expr
-      return subexpr
+      # (_, subexpr) = expr
+      return expr[1]
 
     # (if test conseq else)
     elif procedure is Symbols['if']:        
-      (_, test, conseq, alt) = expr
-      expr = (conseq if eval(test, env) else alt)
+      # (_, test, conseq, alt) = expr
+      expr = (expr[2] if gazeval(expr[1], env) else expr[3])
 
     # (set! var expr)
     elif procedure is Symbols['set!']:      
-      (_, var, subexpr) = expr
-      env.find(var)[var] = eval(subexpr, env)
+      # (_, var, subexpr) = expr
+      env.find(expr[1])[expr[1]] = gazeval(expr[2], env)
       return None
 
     # (def var expr)
     elif procedure is Symbols['def']:
-      (_, var, subexpr) = expr
-      env[var] = eval(subexpr, env)
+      # (_, var, subexpr) = expr
+      env[expr[1]] = gazeval(expr[2], env)
 
       return None
     # (lambda (var*) expr)
     elif procedure is Symbols['lambda']:
-      (_, vars, subexpr) = expr
-      return Procedure(vars, subexpr, env)
+      # (_, vars, subexpr) = expr
+      return Procedure(expr[1], expr[2], env)
 
     # (begin expr+)
     elif procedure is Symbols['begin']:
       for subexpr in expr[1:-1]:
-        eval(expand(subexpr), env)
+        gazeval(expand(subexpr), env)
       expr = expr[-1]
 
     # test exact
     elif procedure == Symbols['check-expect']:
-      (_, var, subexpr) = expr
-      return (eval(var, env) == eval(subexpr, env))
+      # (_, var, subexpr) = expr
+      return (gazeval(expr[1], env) == gazeval(expr[2], env))
 
     # test range
     elif procedure == Symbols['check-within']: 
-      (_, var, lower_bound, upper_bound) = expr
-      return ((eval(var, env) <= eval(upper_bound, env) and
-          (eval(var, env) >= eval(lower_bound, env))))
+      # (_, var, lower_bound, upper_bound) = expr
+      return ((gazeval(expr[1], env) <= gazeval(expr[3], env) and
+          (gazeval(expr[1], env) >= gazeval(expr[2], env))))
     
     # (member? var list)
     elif procedure == Symbols['member?']: 
-      (_, var, lst) = expr
-      return (eval(var, env) in eval(lst, env))
+      # (_, var, lst) = expr
+      return (gazeval(expr[1], env) in gazeval(expr[2], env))
     
     # (display symbol/var)
     elif procedure == Symbols['display']:
-      (_, body) = expr
-      print(gazellestr(eval(body, env)))
+      # (_, body) = expr
+      print(gazellestr(gazeval(expr[1], env)))
       return None
 
     # (return exp)
     elif procedure == Symbols['return']:
-      (_, body) = expr
-      return eval(body, env)
+      # (_, body) = expr
+      return gazeval(expr[1], env)
 
     # (include "filepath")
     elif procedure == Symbols['include']:
-      (_, file) = expr
-      return eval(parse(Atomizer(open(file))), env)
+      # (_, file) = expr
+      return gazeval(parse(expr[1], file=True), env)
 
     # (stdlib)
     elif procedure == Symbols['stdlib']:
-      eval(parse(Atomizer(open('./lib/stdlib.gel'))), env)
+      gazeval(parse('./lib/stdlib.gel', file=True), env)
       return None
 
     # (while cond body)
     elif procedure == Symbols['while']:
 
-      (_, cond, body) = expr
-      while eval(cond, env):
-        eval(body, env)
+      # (_, cond, body) = expr
+      while gazeval(expr[1], env):
+        gazeval(expr[2], env)
 
       return None
     
     # (proc expr*)
     else:                    
-      subexprs = [eval(subexpr, env) for subexpr in expr]
+      subexprs = [gazeval(subexpr, env) for subexpr in expr]
       proc = subexprs.pop(0)
       if isinstance(proc, Procedure):
         expr = proc.body

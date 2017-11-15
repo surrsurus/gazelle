@@ -15,8 +15,11 @@ class Environment(dict):
     single param to list of args. '''
 
     self.outer = outer
+
     if isinstance(params, Symbol): 
+      
       self.update({params:list(args)})
+
     else: 
       if len(args) != len(params):
         raise SyntaxError('expected %s, given %s, ' 
@@ -26,6 +29,9 @@ class Environment(dict):
   def find(self, var):
     ''' Find the innermost Environment where var appears. '''
 
-    if var in self: return self
-    elif self.outer is None: raise LookupError(var)
-    else: return self.outer.find(var)
+    if var in self: 
+      return self
+    elif self.outer is None: 
+      raise LookupError(var)
+    else: 
+      return self.outer.find(var)

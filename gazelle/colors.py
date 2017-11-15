@@ -23,4 +23,4 @@ if os.name != 'nt':
 
 def printf(string, color):
   ''' Print a string and format it with a color. '''
-  print(color + string + ENDC)
+  print(''.join([color, string, ENDC]))

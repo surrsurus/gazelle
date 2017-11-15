@@ -1,7 +1,11 @@
-from gazelle import colors
-from gazelle.parseval import eval, parse
+import sys
+sys.dont_write_bytecode = True
+
+from gazelle.parseval import gazeval, parse
 from gazelle.atomizer import Atomizer
 import gazelle.repl as repl
+
+import pytest
 
 # Test builtin procedures
 builtins_test = [
@@ -24,7 +28,7 @@ builtins_test = [
   ('(if 1 2)', 2),
   ('(if (= 3 4) 2)', None),
   # include
-  ('(include "./euler/one.gel")', 233168),
+  ('(include "./example/euler/one.gel")', 233168),
   # lambda
   ('(def a (lambda (x) (return x)))', None),
   ('(def a (\ (x) (return x)))', None),
@@ -366,61 +370,66 @@ suites = [
   (tail_recursion_tests, 'Tail Recursion')
 ]
 
-def capture(expr, expected):
-  ''' Run a test and capture output, comapre it to an expected
-  value. '''
+### Tests
 
-  # Attempt to run test normally
-  try:
-    result = eval(parse(expr))
-    print('[:] ', expr, '=>', (result))
-    return (result == expected)
-  # Tests can raise exceptions, so capture them slightly differently
-  except Exception as e:
-    print('[#] ', expr, '=raises=>', type(e).__name__, e)
-    # `issubclass` might not work on some tests, so we just capture any
-    # TypeErrors and return false because that that point the test definitely
-    # failed
-    try:
-      # Since we look for exceptions let's properly capture them and not
-      # return False prematurely
-      return issubclass(expected, Exception) and isinstance(e, expected)
-    except TypeError:
-      return False
-
-def integration_tests():
+def test_integration():
   ''' Test each test case in all suites to 
   see if Gazelle code is being properly interpreted. '''
-
-  fails = 0
-  tests = 0
 
   # Iterate over each test in all suites
   for suite in suites:
 
-    # Print section header
-    colors.printf('\n' + suite[1] + ' Tests', colors.HEADER)
+    # Print suite name
+    print(suite[1])
 
     # Iterate over tests in a suite
     for (expr, expected) in suite[0]:
 
-      tests += 1 # Count our tests
-
       # Capture test output
-      if not capture(expr, expected):
+      try:
         
-        # Failed a test if we reached here
-        fails += 1
-        colors.printf(('[!] FAIL: Expected: %s' 
-          % str(expected)), colors.FAIL)
+        # Convert to unicdoe because python has a problem with io.StringIO and python
+        # strings.
 
-  # Print test results
-  colors.printf(('%s %d out of %d tests fail.' 
-    % ('*'*45, fails, tests)), colors.OKBLUE)
+        print('> ' + expr + ' == ' + str(expected))
+        result = gazeval(parse(expr))
+        print('>> got ' + str(result))
 
-  # Print conclusion
-  if fails == 0:
-    colors.printf('[%] Testing concluded successfully', colors.OKGREEN)
-  else:
-    colors.printf('[!] Testing concluded with errors', colors.FAIL)
+        assert result == expected
 
+      except Exception as e:
+        # `issubclass` might not work on some tests, so we just capture any
+        # TypeErrors and return false because that that point the test definitely
+        # failed
+        try:
+          # Since we look for exceptions let's properly capture them and not
+          # return False prematurely
+          assert issubclass(expected, Exception) and isinstance(e, expected)
+        except TypeError:
+          # This will be called when you know you really messed up
+          raise e
+
+### Benchmarks
+
+def test_bench_fizzbuzz(benchmark):
+  def fizzbuzz():
+    gazeval(Atomizer(open('./example/fizzbuzz.gel')))
+  benchmark.pedantic(fizzbuzz, iterations=10, rounds=2000)
+  
+def test_bench_euler_one(benchmark):
+  def euler_one():
+    gazeval(Atomizer(open('./example/euler/one.gel')))
+  benchmark.pedantic(euler_one, iterations=10, rounds=2000)
+
+def test_bench_euler_two(benchmark):
+  def euler_two():
+    gazeval(Atomizer(open('./example/euler/two.gel')))
+  benchmark.pedantic(euler_two, iterations=10, rounds=2000)
+
+def test_bench_euler_three(benchmark):
+  def euler_three():
+    gazeval(Atomizer(open('./example/euler/three.gel')))
+  benchmark.pedantic(euler_three, iterations=10, rounds=2000)
+  
+def test_bench_integration(benchmark):
+  benchmark(test_integration)

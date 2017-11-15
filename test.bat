@@ -1,0 +1,1 @@
+C:\Users\I864584\AppData\Local\Programs\Python\Python36\Scripts\pytest.exe .\tests\testsuite.py

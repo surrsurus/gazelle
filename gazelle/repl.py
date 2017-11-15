@@ -1,25 +1,36 @@
 # Local deps
 from . import colors
+from .atomizer import Atomizer
 from .gazellestr import gazellestr
-from .gazelleerr import gazelleerr
-from .parseval import eval, parse, gazellestr, global_env
+from .parseval import gazeval, parse, gazellestr, global_env
 
-def capture_parseval(expression):
-  ''' Parse, Eval and capture any errors. '''
-
+def run_file(path):
   try:
-    val = eval(parse(expression), global_env)
-    return val
+    gazeval(parse(path, file=True), global_env)
   except Exception as e:
-    gazelleerr(e)
+    colors.printf('[!] %s: %s' % (type(e).__name__, e), colors.FAIL)
 
-# Parse, Eval, and don't capture errors so you can see where something
-# went wrong exactly
-debug_capture_parseval = lambda expr: eval(parse(expr))
+    # TypeErrors arise if a non-callable object is called 
+    # or non-iterable object is iterated over
+    if type(e) == TypeError:
+      if 'object is not callable' in str(e):
+        colors.printf('[#] This could be a problem because the lefthand term of an expression isn\'t a procedure\n[:] Make sure to use `quote` (\') on lists of atoms.', colors.FAIL)
+      if 'object is not iterable' in str(e):
+        colors.printf('[#] You cannot iterate over an atom or procedure.\n[:] In addition, some procedures only take lists as inputs.', colors.FAIL)
+          
+    # LookupErrors arise if a symbol can't be found in an Environment
+    elif type(e) == LookupError:
+      colors.printf('[#] ' + str(e) + ' cannot be found in the current scope.\n[:] This might be a typo, or this symbol is not defined', colors.FAIL)
+
+    # ValueErrors occur if the user tries to give a procedure more arguments than it needs
+    elif type(e) == ValueError:
+      colors.printf('[#] You are trying to give a procedure more arguments than it can handle.', colors.FAIL)
+    else:
+      raise e
 
 # (String) -> None
 def run(prompt='gel> ', subprompt='> '):
-  ''' A prompt-read-eval-print loop.
+  ''' A prompt-read-gazeval-print loop.
   The repl
    1. Reads from stdin through `raw_input`
    2. Parses the input into an expanded gazelle expression
@@ -29,6 +40,7 @@ def run(prompt='gel> ', subprompt='> '):
    5. Goes back to step 1 '''
   
   try:
+    
     while True:
       
       inpt = input(prompt)
@@ -42,12 +54,31 @@ def run(prompt='gel> ', subprompt='> '):
         inpt += ' ' # Lack of an extra space may cause some programs to fail
         inpt += input((len(prompt)-len(subprompt)) * ' ' + subprompt)
 
-      val = capture_parseval(inpt)
+      val = gazeval(parse(inpt), global_env)
 
       if val is not None:
         print(gazellestr(val))
+
   except Exception as e:
     if isinstance(e, KeyboardInterrupt) or isinstance(e, EOFError):
       pass
     else:
-      raise e
+      colors.printf('[!] %s: %s' % (type(e).__name__, e), colors.FAIL)
+
+      # TypeErrors arise if a non-callable object is called 
+      # or non-iterable object is iterated over
+      if type(e) == TypeError:
+        if 'object is not callable' in str(e):
+          colors.printf('[#] This could be a problem because the lefthand term of an expression isn\'t a procedure\n[:] Make sure to use `quote` (\') on lists of atoms.', colors.FAIL)
+        if 'object is not iterable' in str(e):
+          colors.printf('[#] You cannot iterate over an atom or procedure.\n[:] In addition, some procedures only take lists as inputs.', colors.FAIL)
+          
+      # LookupErrors arise if a symbol can't be found in an Environment
+      elif type(e) == LookupError:
+        colors.printf('[#] ' + str(e) + ' cannot be found in the current scope.\n[:] This might be a typo, or this symbol is not defined', colors.FAIL)
+
+      # ValueErrors occur if the user tries to give a procedure more arguments than it needs
+      elif type(e) == ValueError:
+        colors.printf('[#] You are trying to give a procedure more arguments than it can handle.', colors.FAIL)
+      else:
+        raise e

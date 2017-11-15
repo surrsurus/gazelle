@@ -66,5 +66,5 @@ def make_env():
     })
   return env
 
-# Create a global env for `eval()` to access
+# Create a global env for `gazeval()` to access
 global_env = make_env()

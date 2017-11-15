@@ -24,7 +24,7 @@ Here's how you can get started programming in Gazelle.
 
 ### Prerequisites
 
-Before you can run Gazelle, you'll need to have [Python 3.7](https://www.python.org/downloads/) installed for your respective OS. Then, make sure to download either the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle or the latest master.
+Before you can run Gazelle, you'll need to have [Python 3.6](https://www.python.org/downloads/) installed for your respective OS. Then, make sure to download either the [latest release](https://github.com/surrsurus/gazelle/releases) of Gazelle or the latest master.
 
 ### Running Gazelle
 
@@ -32,11 +32,11 @@ For more detail, check out the [getting started guide](https://github.com/surrsu
 
 #### Windows
 
-To run the repl, run `python gazelle.py` in the root directory from the commandline. On linux/OSX this might be `python3 gazelle.py`
+To run the repl, run `python gazelle.py` in the root directory from the commandline.
 
 #### Linux/OSX
 
-To run the repl on linux/OSX, you can run `linux-repl.bat` in the root directory of Gazelle. You could also run `python2 gazelle.py`.
+To run the repl on linux/OSX, you can run `python3 gazelle.py` in the root directory of Gazelle.
 
 ### Basic Usage
 

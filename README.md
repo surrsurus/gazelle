@@ -14,7 +14,7 @@ Gazelle is:
 
 Not convinced? Gazelle can be used to write answers to Project Euler questions. Here's problem 1:
 
-```
+```scheme
 (return (sum (filter (\ (n) (or (= (% n 5) 0) (= (% n 3) 0))) (range 1000))))
 ```
 
@@ -49,7 +49,7 @@ In addition, files can be ran by using a file path as your argument such as `pyt
 First, install the testing requirements.
 
 ```
-pip install -r requirements.txt
+$ pip install -r requirements.txt
 ```
 
 To run the tests, run `pytest tests/testsuite.py` from the root directory. This will start the tests and get benchmarking data.
